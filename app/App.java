@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-import DAO.CreateUserDAO;
-import DAO.LoginUserDAO;
+import DTO.CreateUserDTO;
+import DTO.LoginUserDTO;
 import contoller.UserController;
 import util.StringCheck;
 import view.MainPage;
@@ -38,13 +38,13 @@ public class App {
 	        		// 문자열 길이만 체크?
 	        		String nickname = sc.next();
 	        		
-	        		userColltroller.createUser(new CreateUserDAO(email, password, nickname));
+	        		userColltroller.createUser(new CreateUserDTO(email, password, nickname));
 	        		break;
 	        	case 2 : 
 	        		email = sc.next();
 	        		password = sc.next();
 
-	        		userColltroller.login(new LoginUserDAO(email, password));
+	        		userColltroller.login(new LoginUserDTO(email, password));
 	        		
 	        		break;
 	        	default : System.out.println("화면에 표시된 값만 입력하실 수 있습니다");

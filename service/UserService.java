@@ -1,16 +1,16 @@
 package service;
 
-import DAO.CreateUserDAO;
-import DAO.LoginUserDAO;
+import DTO.CreateUserDTO;
+import DTO.LoginUserDTO;
 import app.App;
 
 public class UserService {
 	
-	public void createUser(CreateUserDAO dao) {
+	public void createUser(CreateUserDTO dto) {
 		
 	}
 	
-	public void login(LoginUserDAO dao) {
+	public void login(LoginUserDTO dao) {
 		
 		App.userEmail = dao.getEmail();
 		App.loginCheck = true;

@@ -1,18 +1,18 @@
 package contoller;
 
-import DAO.CreateUserDAO;
-import DAO.LoginUserDAO;
+import DTO.CreateUserDTO;
+import DTO.LoginUserDTO;
 import service.UserService;
 
 public class UserController {
 	UserService userService = new UserService();
 	
-	public void createUser(CreateUserDAO dao) {
-		userService.createUser(dao);
+	public void createUser(CreateUserDTO dto) {
+		userService.createUser(dto);
 		
 	}
 	
-	public void login(LoginUserDAO dao) {
+	public void login(LoginUserDTO dao) {
 		userService.login(dao);
 		
 	}

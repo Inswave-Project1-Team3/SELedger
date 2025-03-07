@@ -1,13 +1,11 @@
-package DAO;
+package DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class CreateUserDAO {
+public class LoginUserDTO {
 	private String email;
     private String password;
-    private String nickname;
-
 }
