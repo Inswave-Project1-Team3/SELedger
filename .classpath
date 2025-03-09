@@ -6,6 +6,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path=""/>
-	<classpathentry kind="lib" path="C:/inswave/JAVA/utils/lombok.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/eclipse/lombok.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
