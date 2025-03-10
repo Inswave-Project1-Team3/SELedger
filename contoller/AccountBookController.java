@@ -1,7 +1,6 @@
 package contoller;
 
 import DTO.CreateAccountBookDTO;
-import model.DayAccountBook;
 import service.AccountBookService;
 
 public class AccountBookController {
@@ -11,9 +10,8 @@ public class AccountBookController {
 
     }
 
-    public DayAccountBook getDayAccountBook(int number){
+    public void getDayAccountBook(){
         accountBookService.getToFile();
-        return null;
     }
 
 }

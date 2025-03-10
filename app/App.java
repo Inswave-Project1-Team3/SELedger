@@ -1,6 +1,7 @@
 package app;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -9,11 +10,13 @@ import DTO.LoginUserDTO;
 import DTO.CreateAccountBookDTO;
 import contoller.AccountBookController;
 import contoller.UserController;
+import model.DayAccountBook;
 import util.StringCheck;
 import view.MainPage;
 
 public class App {
     private static final Map<String, Integer> CurrentMonth = new HashMap<>();
+    public static Map<Integer, List<DayAccountBook>> dayAccountBookMap = new HashMap<>();
     public static boolean loginCheck;
     public static String userEmail = "";
 
@@ -21,14 +24,14 @@ public class App {
     	Scanner sc = new Scanner(System.in);
     	MainPage mainPage = new MainPage();
     	StringCheck stringcheck = new StringCheck();
-    	UserController userColltroller = new UserController();
+    	UserController userController = new UserController();
 		AccountBookController accountBookController = new AccountBookController();
 
     	
         while (true) {
 
-            // 로그인 아닐 시
             int number;
+            // 로그인이 아닐 경우
             if (loginCheck) {
                 mainPage.anonymousMainPage();
                 number = stringcheck.numberCheck(sc.next());
@@ -43,13 +46,13 @@ public class App {
                         // 문자열 길이만 체크?
                         String nickname = sc.next();
 
-                        userColltroller.createUser(new CreateUserDTO(email, password, nickname));
+                        userController.createUser(new CreateUserDTO(email, password, nickname));
                         break;
                     case 2:
                         email = sc.next();
                         password = sc.next();
 
-                        userColltroller.login(new LoginUserDTO(email, password));
+                        userController.login(new LoginUserDTO(email, password));
 
                         break;
                     default:
@@ -66,6 +69,7 @@ public class App {
 //                        accountBookNumber = stringcheck.numberCheck(sc.next());
 //                        accountBookController.getDayAccountBook(accountBookNumber);
 
+                        accountBookController.getDayAccountBook();
                         mainPage.DayAccountBookPage();
                         accountBookNumber = stringcheck.numberCheck(sc.next());
                         	switch (accountBookNumber){
@@ -77,10 +81,12 @@ public class App {
                                     boolean benefitCheck = (sc.next().equals("0"));
                                     long price = sc.nextLong();
                                     String memo = sc.next();
-
                                     accountBookController.createDayAccountBook(new CreateAccountBookDTO(benefitCheck, price, memo));
                                     break;
-                                case 9 : accountBookController.getDayAccountBook(1);
+                                case 2 : // 회원정보 수정, 로그아웃, 계정탈퇴
+
+                                    break;
+                                case 9 :
                             }
 
                         break;
