@@ -9,7 +9,8 @@ import DTO.CreateUserDTO;
 import DTO.LoginUserDTO;
 import contoller.AccountBookController;
 import contoller.UserController;
-import model.Category;
+import model.ExpenseCategory;
+import model.IncomeCategory;
 import model.MonthAccountBook;
 import util.StringCheck;
 import view.MainPage;
@@ -90,10 +91,12 @@ public class App {
                         double amount = sc.nextDouble();
                         System.out.print("카테고리 (예: FOOD, TRANSPORT, SALARY 등): ");
                         String categoryStr = sc.next().toUpperCase();
-                        Category category;
+                        IncomeCategory incomecategory;
+                        ExpenseCategory expensecategory;
 
                         try {
-                            category = Category.valueOf(categoryStr);
+                            incomecategory = IncomeCategory.valueOf(categoryStr);
+                            expensecategory = ExpenseCategory.valueOf(categoryStr);
                         } catch (IllegalArgumentException e) {
                             System.out.println("잘못된 카테고리입니다. 다시 입력하세요.");
                             continue;
@@ -103,7 +106,7 @@ public class App {
                         String description = sc.next();
 
                         // 거래 내역 추가
-                        accountBookController.addTransaction(new AccountBookDTO(date, amount, category, description));
+                        //accountBookController.addTransaction(new AccountBookDTO(date, amount, incomecategory, description));
                         System.out.println("거래 내역이 추가되었습니다.");
                         break;
 
@@ -120,7 +123,8 @@ public class App {
                             System.out.println("총 수입: " + monthAccountBook.getTotalIncomeByDate(LocalDate.now()));
                             System.out.println("총 지출: " + monthAccountBook.getTotalExpenseByDate(LocalDate.now()));
                             System.out.println("총 잔액: " + monthAccountBook.getTotalMoney());
-                            System.out.println("가장 많이 사용한 카테고리: " + monthAccountBook.getMaxCategory());
+                            System.out.println("가장 많이 사용한 수입 카테고리: " + monthAccountBook.getMaxIncomeCategory());
+                            System.out.println("가장 많이 사용한 지출 카테고리: " + monthAccountBook.getMaxExpenseCategory());
                         }
                         break;
 

@@ -34,7 +34,7 @@ public class AccountBookService implements Serializable {
      */
     public void addTransaction(AccountBookDTO dto) {
         MonthAccountBook monthBook = getOrCreateMonthAccountBook(YearMonth.from(dto.getDate()));
-        TransactionAccountBook transaction = new TransactionAccountBook(dto.getAmount(), dto.getCategory(), dto.getDescription());
+        TransactionAccountBook transaction = new TransactionAccountBook(0, false, null, null, null, null, false, 0);
         monthBook.addTransaction(dto.getDate(), transaction);
         saveMonthAccountBook(monthBook);
     }
@@ -114,5 +114,6 @@ public class AccountBookService implements Serializable {
     private File getMonthAccountBookFile(YearMonth month) {
         return new File("data/" + month + ".ser");
     }
+
 }
 

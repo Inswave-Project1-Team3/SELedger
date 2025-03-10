@@ -1,19 +1,10 @@
 package model;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.Map;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class MonthAccountBook {
 	
     private YearMonth month; //해당 월 
@@ -26,7 +17,48 @@ public class MonthAccountBook {
 
     private Map<Integer, DayAccountBook> dayAccountBookMaps = new HashMap<>(); //일별 가계부를 저장(Key: 해당 월의 날짜, Value: 해당 날짜의 가계부)
 
-    /**
+    
+    public YearMonth getMonth() {
+		return month;
+	}
+
+	public void setMonth(YearMonth month) {
+		this.month = month;
+	}
+
+	public long getTotalMoney() {
+		return totalMoney;
+	}
+
+	public void setTotalMoney(long totalMoney) {
+		this.totalMoney = totalMoney;
+	}
+
+	public IncomeCategory getMaxIncomeCategory() {
+		return maxIncomeCategory;
+	}
+
+	public void setMaxIncomeCategory(IncomeCategory maxIncomeCategory) {
+		this.maxIncomeCategory = maxIncomeCategory;
+	}
+
+	public ExpenseCategory getMaxExpenseCategory() {
+		return maxExpenseCategory;
+	}
+
+	public void setMaxExpenseCategory(ExpenseCategory maxExpenseCategory) {
+		this.maxExpenseCategory = maxExpenseCategory;
+	}
+
+	public Map<Integer, DayAccountBook> getDayAccountBookMaps() {
+		return dayAccountBookMaps;
+	}
+
+	public void setDayAccountBookMaps(Map<Integer, DayAccountBook> dayAccountBookMaps) {
+		this.dayAccountBookMaps = dayAccountBookMaps;
+	}
+
+	/**
      * 특정 날짜에 거래 내역을 추가하는 메서드
      * @param date 거래가 발생한 날짜
      * @param transaction 추가할 거래 내역
@@ -75,9 +107,9 @@ public class MonthAccountBook {
     /**
      * 가장 많이 사용된 카테고리 업데이트
      */
-    private void updateMaxCategory() {
-    	Map<IncomeCategory, Double> categoryIncomeSum = new HashMap<>();
-        Map<ExpenseCategory, Double> categoryExpenseSum = new HashMap<>();
+    /*private void updateMaxCategory() {
+    	Map<IncomeCategory, Double> categoryIncomeSum = new HashMap<IncomeCategory, Double>();
+    	Map<ExpenseCategory, Double> categoryExpenseSum = new HashMap<ExpenseCategory, Double>();
         for (DayAccountBook book : dayAccountBookMaps.values()) {
             for (TransactionAccountBook transaction : book.getTransactions()) {
                 categoryIncomeSum.put(transaction.getIncomeCategory(),
@@ -94,9 +126,13 @@ public class MonthAccountBook {
                 										  .max(Map.Entry.comparingByValue())
                 										  .map(Map.Entry::getKey)
                 										  .orElse(null);
-    }
+    }*/
 
-	public MonthAccountBook(YearMonth month) {
-		// TODO Auto-generated constructor stub
-	}
+    public MonthAccountBook(YearMonth month) {
+        this.month = month;
+        this.totalMoney = 0; // 기본값 0으로 초기화
+        this.maxIncomeCategory = null; // 기본값으로 null 설정 (필요에 따라 다른 값 설정 가능)
+        this.maxExpenseCategory = null; // 기본값으로 null 설정 (필요에 따라 다른 값 설정 가능)
+        this.dayAccountBookMaps = new HashMap<>(); // 맵 초기화
+    }
 }

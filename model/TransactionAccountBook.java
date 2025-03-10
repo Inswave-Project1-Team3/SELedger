@@ -1,15 +1,6 @@
 package model;
 
 import java.time.LocalDate;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class TransactionAccountBook {
 
 	private long dayAccountBookId;
@@ -21,8 +12,18 @@ public class TransactionAccountBook {
 	private boolean benefit;
 	private long price;
 	
-	public TransactionAccountBook(double amount, String category, String description) {
-		// TODO Auto-generated constructor stub
+
+	public TransactionAccountBook(long dayAccountBookId, boolean benefitCheck, LocalDate createTime,
+			LocalDate updateTime, IncomeCategory incomeCategory, ExpenseCategory expenseCategory, boolean benefit,
+			long price) {
+		this.dayAccountBookId = dayAccountBookId;
+		this.benefitCheck = benefitCheck;
+		this.createTime = createTime;
+		this.updateTime = updateTime;
+		this.incomeCategory = incomeCategory;
+		this.expenseCategory = expenseCategory;
+		this.benefit = benefit;
+		this.price = price;
 	}
 
 	public IncomeCategory getIncomeCategory() {
