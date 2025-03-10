@@ -61,7 +61,7 @@ local.properties
 
 # Uncomment this line if you wish to ignore the project description file.
 # Typically, this file would be tracked if it contains build/dependency configurations:
-#.project
+.project
 
 ### Eclipse Patch ###
 # Spring Boot Tooling
@@ -264,5 +264,15 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# Eclipse 관련 설정파일
+.classpath
+
+# IntelliJ 설정파일
+.idea/
+*.iml
+
+# 회원정g 파일
+data/
 
 # End of https://www.toptal.com/developers/gitignore/api/java,windows,macos,intellij,eclipse
