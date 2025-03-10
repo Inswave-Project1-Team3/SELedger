@@ -126,6 +126,15 @@ public class App {
                     System.out.println("현재 비밀번호를 입력하세요:");
                     String currentPassword = sc.next();
                     
+                    System.out.println("새 이메일을 입력하세요 (변경하지 않으려면 'skip' 입력):");
+                    String newEmail = sc.next();
+                    if (newEmail.equalsIgnoreCase("skip"))
+                        newEmail = null;
+                    else if (!InputValidator.isValidEmail(newEmail)) {
+                        System.out.println("이메일 형식이 올바르지 않습니다.");
+                        break;
+                    }
+                    
                     System.out.println("새 비밀번호를 입력하세요 (8자리 이상, 특수문자 포함, 변경하지 않으려면 'skip' 입력):");
                     String newPassword = sc.next();
                     if (newPassword.equalsIgnoreCase("skip"))
@@ -139,7 +148,7 @@ public class App {
                     String newNickname = null;
                     System.out.println("닉네임은 변경할 수 없습니다. 회원가입 시 설정한 닉네임이 유지됩니다.");
                     
-                    userController.updateUser(new UpdateUserDTO(userEmail, currentPassword, newPassword, newNickname));
+                    userController.updateUser(new UpdateUserDTO(userEmail, currentPassword, newEmail, newPassword, newNickname));
                     break;
                     
                 case 3: // 회원탈퇴

@@ -156,9 +156,20 @@ public class UserController {
 		
 		try {
 			boolean result = userService.updateUser(dto);
-			if (result)
+			if (result) {
 				System.out.println("회원정보가 성공적으로 수정되었습니다.");
-			else
+				
+				// 이메일이 변경된 경우 App 클래스의 정적 변수 업데이트
+				if (dto.getNewEmail() != null && !dto.getNewEmail().isEmpty()) {
+					if (App.class != null) {
+						try {
+							App.userEmail = dto.getNewEmail();
+						} catch (Exception e) {
+							// App 클래스가 없거나 접근할 수 없는 경우 무시
+						}
+					}
+				}
+			} else
 				System.out.println("회원정보 수정에 실패했습니다. 현재 비밀번호를 확인해주세요.");
 			
 			return result;

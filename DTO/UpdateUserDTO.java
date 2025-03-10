@@ -28,6 +28,13 @@ public class UpdateUserDTO {
 	private String currentPassword;
 	
 	/**
+	 * 새 이메일 (변경 시)
+	 * null이거나 빈 문자열이면 이메일을 변경하지 않습니다.
+	 * 값이 있으면 이메일 형식에 맞아야 합니다.
+	 */
+	private String newEmail;
+	
+	/**
 	 * 새 비밀번호 (변경 시)
 	 * null이거나 빈 문자열이면 비밀번호를 변경하지 않습니다.
 	 * 값이 있으면 8자리 이상이며, 최소 하나 이상의 특수문자를 포함해야 합니다.

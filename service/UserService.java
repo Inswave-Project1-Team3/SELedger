@@ -155,7 +155,7 @@ public class UserService {
 	/**
 	 * 회원정보 수정
 	 * 
-	 * 현재 비밀번호를 확인한 후, 새 비밀번호와 닉네임을 업데이트합니다.
+	 * 현재 비밀번호를 확인한 후, 새 이메일, 새 비밀번호, 닉네임을 업데이트합니다.
 	 * 닉네임은 변경할 수 없으므로, 닉네임 변경 요청은 무시됩니다.
 	 * 
 	 * @param dto 회원정보 수정 정보를 담은 DTO
@@ -167,6 +167,16 @@ public class UserService {
 		if (!InputValidator.isValidEmail(dto.getEmail()))
 			throw new IllegalArgumentException("이메일 형식이 올바르지 않습니다.");
 		
+		// 새 이메일이 있는 경우 검증
+		if (dto.getNewEmail() != null && !dto.getNewEmail().isEmpty()) {
+			if (!InputValidator.isValidEmail(dto.getNewEmail()))
+				throw new IllegalArgumentException("새 이메일 형식이 올바르지 않습니다.");
+			
+			// 새 이메일 중복 체크
+			if (!dto.getEmail().equals(dto.getNewEmail()) && userRepository.findByEmail(dto.getNewEmail()).isPresent())
+				throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+		}
+		
 		// 새 비밀번호가 있는 경우 검증
 		if (dto.getNewPassword() != null && !dto.getNewPassword().isEmpty()) {
 			if (!InputValidator.isValidPassword(dto.getNewPassword()))
@@ -177,7 +187,7 @@ public class UserService {
 		if (dto.getNickname() != null && !dto.getNickname().isEmpty()) {
 			System.out.println("닉네임은 변경할 수 없습니다. 닉네임 변경 요청이 무시됩니다.");
 			// 닉네임 변경 요청 무시 (null로 설정)
-			dto = new UpdateUserDTO(dto.getEmail(), dto.getCurrentPassword(), dto.getNewPassword(), null);
+			dto = new UpdateUserDTO(dto.getEmail(), dto.getCurrentPassword(), dto.getNewEmail(), dto.getNewPassword(), null);
 		}
 		
 		// 이메일로 사용자 조회
@@ -190,8 +200,8 @@ public class UserService {
 			if (!user.loginUser(dto.getEmail(), dto.getCurrentPassword()))
 				return false; // 비밀번호 불일치
 			
-			// 정보 업데이트 (비밀번호만 변경 가능)
-			user.updateUserInfo(dto.getNewPassword(), null);
+			// 정보 업데이트
+			user.updateUserInfo(dto.getNewEmail(), dto.getNewPassword(), null);
 			return userRepository.update(user);
 		}
 		

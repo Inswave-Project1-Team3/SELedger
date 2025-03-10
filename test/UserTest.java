@@ -151,6 +151,15 @@ public class UserTest {
 		System.out.print("현재 비밀번호: ");
 		String currentPassword = scanner.next();
 		
+		System.out.println("새 이메일 (변경하지 않으려면 'skip' 입력): ");
+		String newEmail = scanner.next();
+		if (newEmail.equalsIgnoreCase("skip"))
+			newEmail = null;
+		else if (!InputValidator.isValidEmail(newEmail)) {
+			System.out.println("이메일 형식이 올바르지 않습니다.");
+			return;
+		}
+		
 		System.out.println("새 비밀번호 (8자리 이상, 특수문자 포함, 변경하지 않으려면 'skip' 입력): ");
 		String newPassword = scanner.next();
 		if (newPassword.equalsIgnoreCase("skip"))
@@ -164,13 +173,14 @@ public class UserTest {
 		System.out.println("닉네임은 변경할 수 없습니다. 회원가입 시 설정한 닉네임이 유지됩니다.");
 		String newNickname = null;
 		
+		// 현재 사용자 정보 조회
 		User currentUser = userController.getCurrentUser();
 		if (currentUser == null) {
 			System.out.println("사용자 정보를 조회할 수 없습니다.");
 			return;
 		}
 		
-		UpdateUserDTO dto = new UpdateUserDTO(currentUser.getEmail(), currentPassword, newPassword, newNickname);
+		UpdateUserDTO dto = new UpdateUserDTO(currentUser.getEmail(), currentPassword, newEmail, newPassword, newNickname);
 		boolean result = userController.updateUser(dto);
 		
 		if (result)

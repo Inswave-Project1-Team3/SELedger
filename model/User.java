@@ -73,10 +73,15 @@ public class User implements Serializable {
 	/**
 	 * 사용자 정보 업데이트
 	 * 
+	 * @param email 새 이메일 (null이거나 빈 문자열이면 변경하지 않음)
 	 * @param password 새 비밀번호 (null이거나 빈 문자열이면 변경하지 않음)
 	 * @param nickName 새 닉네임 (null이거나 빈 문자열이면 변경하지 않음)
 	 */
-	public void updateUserInfo(String password, String nickName) {
+	public void updateUserInfo(String email, String password, String nickName) {
+		// 이메일이 제공된 경우에만 업데이트
+		if (email != null && !email.isEmpty())
+			this.email = email;
+		
 		// 비밀번호가 제공된 경우에만 업데이트
 		if (password != null && !password.isEmpty())
 			this.password = encryptPassword(password);
