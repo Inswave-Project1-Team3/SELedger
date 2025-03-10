@@ -1,10 +1,12 @@
 package service;
 
 import DTO.CreateAccountBookDTO;
+import DTO.CreateTransactionAccountBookDTO;
 import model.DayAccountBook;
+import model.TransactionAccountBook;
+
 import java.io.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,38 +15,38 @@ import static app.App.dayAccountBookMap;
 
 public class AccountBookService {
 
-    public void createAccountBook(CreateAccountBookDTO dto) {
+    public void createAccountBook(CreateAccountBookDTO accountBookDTO, CreateTransactionAccountBookDTO transactionAccountBookDTO) {
+        getToFile();
+
         int day = LocalDateTime.now().getDayOfMonth();
-        getToFile(); // 파일에서 데이터를 불러옴
 
-        // 기존 데이터가 없을 경우를 대비하여 안전한 방식으로 가져오기
-        List<DayAccountBook> list = dayAccountBookMap.getOrDefault(day, new ArrayList<>());
+        TransactionAccountBook transactionAccountBook = new TransactionAccountBook(
+                transactionAccountBookDTO.isBenefit(),
+                transactionAccountBookDTO.getMoney()
+        );
 
-        // 새로운 데이터 추가
-        list.add(new DayAccountBook(dto.isBenefitCheck(), dto.getPrice(), dto.getMemo()));
-
-        // 맵 업데이트
-        dayAccountBookMap.put(day, list);
-
-        // 변경된 데이터를 다시 저장
-        saveToFile();
+        List<TransactionAccountBook> list = dayAccountBookMap.get(day).getTransactionAccountBooks();
+        list.add(transactionAccountBook);
+        DayAccountBook dayAccountBook = new DayAccountBook(accountBookDTO.getMemo(), list);
+        dayAccountBookMap.put(day, dayAccountBook);
 
         // 출력
-        list = dayAccountBookMap.get(day);
-        for (int i = 0; i < list.size(); i++) {
-            System.out.println(
-                    list.get(i).getCreateDate() + ", " +
-                    list.get(i).getMemo() + ", " +
-                    list.get(i).isBenefitCheck() +", " +
-                    list.get(i).getMoney());
+        for(int i = 0; i < dayAccountBookMap.get(day).getTransactionAccountBooks().size(); i++){
+            System.out.println(dayAccountBookMap.get(day).getTransactionAccountBooks().get(i).getMoney() +
+            ", " + dayAccountBookMap.get(day).getTransactionAccountBooks().get(i).getCreateDate() + ", " +
+                    dayAccountBookMap.get(day).getTransactionAccountBooks().get(i).isBenefit());
         }
+
+        System.out.println("메모내용 : " + dayAccountBookMap.get(day).getMemo());
+
+        saveToFile();
 }
 
 
     private void saveToFile() {
         try (FileOutputStream fileOut = new FileOutputStream("C:\\Temp\\day_account_book.ser");
              ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
-            
+
             out.writeObject(dayAccountBookMap);  // Map 전체를 직렬화하여 저장
             System.out.println("등록되었습니다.");
 
@@ -56,7 +58,6 @@ public class AccountBookService {
         File file = new File("C:\\Temp\\day_account_book.ser");
         if (!file.exists()) {
             System.out.println("거래내역이 존재하지 않습니다");
-            dayAccountBookMap = new HashMap<>();
             return;
         }
 
@@ -65,12 +66,9 @@ public class AccountBookService {
 
             // 데이터를 읽어온 후 null 체크
             Object obj = in.readObject();
-            dayAccountBookMap = (obj instanceof Map) ? (Map<Integer, List<DayAccountBook>>) obj : new HashMap<>();
-
+            dayAccountBookMap = (obj instanceof Map) ? (Map<Integer, DayAccountBook>) obj : new HashMap<>();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
-
 }

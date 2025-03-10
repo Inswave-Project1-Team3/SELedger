@@ -1,10 +1,10 @@
 package app;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import DTO.CreateTransactionAccountBookDTO;
 import DTO.CreateUserDTO;
 import DTO.LoginUserDTO;
 import DTO.CreateAccountBookDTO;
@@ -16,7 +16,7 @@ import view.MainPage;
 
 public class App {
     private static final Map<String, Integer> CurrentMonth = new HashMap<>();
-    public static Map<Integer, List<DayAccountBook>> dayAccountBookMap = new HashMap<>();
+    public static Map<Integer, DayAccountBook> dayAccountBookMap = new HashMap<>();
     public static boolean loginCheck;
     public static String userEmail = "";
 
@@ -79,9 +79,11 @@ public class App {
                                     System.out.println("가격");
                                     System.out.println("메모내용");
                                     boolean benefitCheck = (sc.next().equals("0"));
-                                    long price = sc.nextLong();
+                                    long money = sc.nextLong();
                                     String memo = sc.next();
-                                    accountBookController.createDayAccountBook(new CreateAccountBookDTO(benefitCheck, price, memo));
+                                    accountBookController.createDayAccountBook(
+                                            new CreateAccountBookDTO(memo),
+                                            new CreateTransactionAccountBookDTO(benefitCheck, money));
                                     break;
                                 case 2 : // 회원정보 수정, 로그아웃, 계정탈퇴
 
