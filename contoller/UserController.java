@@ -20,8 +20,8 @@ public class UserController {
 	// 사용자 관련 비즈니스 로직을 처리하는 서비스
 	private final UserService userService;
 	
-	// 현재 로그인한 사용자의 이메일 (로그아웃 상태면 null)
-	private String currentUserEmail = null;
+	// 현재 로그인한 사용자의 닉네임 (로그아웃 상태면 null)
+	private String currentUserNickName = null;
 	
 	// 로그인 상태 (true: 로그인, false: 로그아웃)
 	private boolean isLoggedIn = false;
@@ -84,7 +84,13 @@ public class UserController {
 		if (result) {
 			// 로그인 성공 시 컨트롤러 내부 상태 업데이트
 			this.isLoggedIn = true;
-			this.currentUserEmail = dto.getEmail();
+			
+			// 사용자 정보를 조회하여 닉네임 설정
+			User user = userService.getUserByEmail(dto.getEmail());
+			if (user != null) {
+				this.currentUserNickName = user.getNickName();
+			}
+			
 			System.out.println("로그인에 성공했습니다.");
 			
 			// App 클래스의 정적 변수도 업데이트 (기존 코드와의 호환성 유지)
@@ -92,6 +98,7 @@ public class UserController {
 				try {
 					App.loginCheck = true;
 					App.userEmail = dto.getEmail();
+					App.userNickName = this.currentUserNickName;
 				} catch (Exception e) {
 					// App 클래스가 없거나 접근할 수 없는 경우 무시
 				}
@@ -110,7 +117,7 @@ public class UserController {
 	public void logout() {
 		// 컨트롤러 내부 상태 초기화
 		this.isLoggedIn = false;
-		this.currentUserEmail = null;
+		this.currentUserNickName = null;
 		System.out.println("로그아웃 되었습니다.");
 		
 		// App 클래스의 정적 변수도 업데이트 (기존 코드와의 호환성 유지)
@@ -118,6 +125,7 @@ public class UserController {
 			try {
 				App.loginCheck = false;
 				App.userEmail = "";
+				App.userNickName = "";
 			} catch (Exception e) {
 				// App 클래스가 없거나 접근할 수 없는 경우 무시
 			}
@@ -136,7 +144,8 @@ public class UserController {
 	 */
 	public boolean updateUser(UpdateUserDTO dto) {
 		// 로그인 상태 및 현재 사용자 확인
-		if (!isLoggedIn || !currentUserEmail.equals(dto.getEmail())) {
+		User currentUser = getCurrentUser();
+		if (!isLoggedIn || currentUser == null || !currentUser.getNickName().equals(this.currentUserNickName)) {
 			System.out.println("회원정보 수정 권한이 없습니다.");
 			return false;
 		}
@@ -172,7 +181,8 @@ public class UserController {
 	 */
 	public boolean deleteUser(DeleteUserDTO dto) {
 		// 로그인 상태 및 현재 사용자 확인
-		if (!isLoggedIn || !currentUserEmail.equals(dto.getEmail())) {
+		User currentUser = getCurrentUser();
+		if (!isLoggedIn || currentUser == null || !currentUser.getNickName().equals(this.currentUserNickName)) {
 			System.out.println("회원탈퇴 권한이 없습니다.");
 			return false;
 		}
@@ -198,7 +208,7 @@ public class UserController {
 		if (!isLoggedIn)
 			return null;
 		
-		return userService.getUserByEmail(currentUserEmail);
+		return userService.getUserByNickName(currentUserNickName);
 	}
 	
 	/**
@@ -211,12 +221,12 @@ public class UserController {
 	}
 	
 	/**
-	 * 현재 로그인한 사용자의 이메일 조회
+	 * 현재 로그인한 사용자의 닉네임 조회
 	 * 
-	 * @return 현재 사용자 이메일 (로그인 상태가 아니면 null)
+	 * @return 현재 사용자 닉네임 (로그인 상태가 아니면 null)
 	 */
-	public String getCurrentUserEmail() {
-		return isLoggedIn ? currentUserEmail : null;
+	public String getCurrentUserNickName() {
+		return isLoggedIn ? currentUserNickName : null;
 	}
 	
 	/**
@@ -228,7 +238,11 @@ public class UserController {
 		if (!isLoggedIn)
 			return null;
 		
-		return FileUtil.getUserDirectoryPath(currentUserEmail);
+		User currentUser = getCurrentUser();
+		if (currentUser != null) {
+			return FileUtil.getUserDirectoryPath(currentUser.getEmail());
+		}
+		return null;
 	}
 }
 

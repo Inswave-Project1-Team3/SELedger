@@ -23,6 +23,7 @@ public class App {
     private static final Map<String, Integer> CurrentMonth = new HashMap<>();
     public static boolean loginCheck = false; // 초기값은 false (로그인 안 된 상태)
     public static String userEmail = "";
+    public static String userNickName = ""; // 사용자 닉네임 정보 저장
 
     /**
      * 애플리케이션 실행 메서드
@@ -94,6 +95,10 @@ public class App {
                     password = sc.next();
 
                     userController.login(new LoginUserDTO(email, password));
+                    // 로그인 성공 시 닉네임 정보 업데이트
+                    if (loginCheck) {
+                        userNickName = userController.getCurrentUserNickName();
+                    }
                     break;
                     
                 case 0: // 프로그램 종료
@@ -151,6 +156,8 @@ public class App {
                     
                 case 4: // 로그아웃
                     userController.logout();
+                    // 로그아웃 시 닉네임 정보 초기화
+                    userNickName = "";
                     break;
                     
                 case 0: // 프로그램 종료

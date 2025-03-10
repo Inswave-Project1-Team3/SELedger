@@ -240,4 +240,21 @@ public class UserService {
 		
 		return userRepository.findByEmail(email).orElse(null);
 	}
+	
+	/**
+	 * 닉네임으로 사용자 조회
+	 * 
+	 * @param nickname 조회할 사용자의 닉네임
+	 * @return 사용자 객체 (없으면 null)
+	 */
+	public User getUserByNickName(String nickname) {
+		if (nickname == null || nickname.isEmpty())
+			return null;
+		
+		// 모든 사용자를 조회하여 닉네임이 일치하는 사용자 반환
+		return userRepository.findAll().stream()
+				.filter(user -> user.getNickName().equals(nickname))
+				.findFirst()
+				.orElse(null);
+	}
 }

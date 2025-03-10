@@ -18,7 +18,7 @@ import java.util.Scanner;
 public class UserTest {
 	private static final UserController userController = new UserController();
 	private static final Scanner scanner = new Scanner(System.in);
-	private static String currentUserEmail = null;
+	private static String currentUserNickName = null;
 	private static final StringCheck stringCheck = new StringCheck();
 	
 	/**
@@ -130,7 +130,7 @@ public class UserTest {
 		
 		if (result) {
 			System.out.println("로그인 성공!");
-			currentUserEmail = email;
+			currentUserNickName = userController.getCurrentUserNickName();
 		} else
 			System.out.println("로그인 실패!");
 	}
@@ -143,7 +143,7 @@ public class UserTest {
 	private static void testUpdateUser() {
 		System.out.println("\n===== 회원정보 수정 테스트 =====");
 		
-		if (currentUserEmail == null) {
+		if (currentUserNickName == null) {
 			System.out.println("로그인이 필요합니다. 먼저 로그인해주세요.");
 			return;
 		}
@@ -164,7 +164,13 @@ public class UserTest {
 		System.out.println("닉네임은 변경할 수 없습니다. 회원가입 시 설정한 닉네임이 유지됩니다.");
 		String newNickname = null;
 		
-		UpdateUserDTO dto = new UpdateUserDTO(currentUserEmail, currentPassword, newPassword, newNickname);
+		User currentUser = userController.getCurrentUser();
+		if (currentUser == null) {
+			System.out.println("사용자 정보를 조회할 수 없습니다.");
+			return;
+		}
+		
+		UpdateUserDTO dto = new UpdateUserDTO(currentUser.getEmail(), currentPassword, newPassword, newNickname);
 		boolean result = userController.updateUser(dto);
 		
 		if (result)
@@ -181,7 +187,7 @@ public class UserTest {
 	private static void testDeleteUser() {
 		System.out.println("\n===== 회원탈퇴 테스트 =====");
 		
-		if (currentUserEmail == null) {
+		if (currentUserNickName == null) {
 			System.out.println("로그인이 필요합니다. 먼저 로그인해주세요.");
 			return;
 		}
@@ -197,13 +203,19 @@ public class UserTest {
 		System.out.print("비밀번호: ");
 		String password = scanner.next();
 		
-		DeleteUserDTO dto = new DeleteUserDTO(currentUserEmail, password);
+		User currentUser = userController.getCurrentUser();
+		if (currentUser == null) {
+			System.out.println("사용자 정보를 조회할 수 없습니다.");
+			return;
+		}
+		
+		DeleteUserDTO dto = new DeleteUserDTO(currentUser.getEmail(), password);
 		boolean result = userController.deleteUser(dto);
 		
 		if (result) {
 			System.out.println("회원탈퇴 성공!");
 			System.out.println("사용자 폴더는 데이터 관리를 위해 유지됩니다.");
-			currentUserEmail = null;
+			currentUserNickName = null;
 		} else
 			System.out.println("회원탈퇴 실패!");
 	}
@@ -215,13 +227,13 @@ public class UserTest {
 	private static void testLogout() {
 		System.out.println("\n===== 로그아웃 테스트 =====");
 		
-		if (currentUserEmail == null) {
+		if (currentUserNickName == null) {
 			System.out.println("이미 로그아웃 상태입니다.");
 			return;
 		}
 		
 		userController.logout();
-		currentUserEmail = null;
+		currentUserNickName = null;
 		System.out.println("로그아웃 되었습니다.");
 	}
 	
@@ -232,7 +244,7 @@ public class UserTest {
 	private static void testGetCurrentUser() {
 		System.out.println("\n===== 현재 사용자 정보 조회 테스트 =====");
 		
-		if (currentUserEmail == null) {
+		if (currentUserNickName == null) {
 			System.out.println("로그인이 필요합니다. 먼저 로그인해주세요.");
 			return;
 		}
