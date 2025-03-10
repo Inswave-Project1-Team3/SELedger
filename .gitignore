@@ -272,4 +272,7 @@ $RECYCLE.BIN/
 .idea/
 *.iml
 
+# 회원정g 파일
+data/
+
 # End of https://www.toptal.com/developers/gitignore/api/java,windows,macos,intellij,eclipse
