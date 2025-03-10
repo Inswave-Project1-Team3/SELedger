@@ -5,6 +5,7 @@ import model.DayAccountBook;
 import model.MonthAccountBook;
 import model.TransactionAccountBook;
 
+import java.io.*;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.HashMap;
@@ -13,7 +14,8 @@ import java.util.Map;
 import DTO.AccountBookDTO;
 
 @RequiredArgsConstructor
-public class AccountBookService {
+public class AccountBookService implements Serializable {
+    private static final long serialVersionUID = 1L;
     /** 월별 가계부 저장소 */
     private Map<YearMonth, MonthAccountBook> accountBookRecords = new HashMap<>();
 
@@ -23,17 +25,18 @@ public class AccountBookService {
      * @return 해당 월의 가계부
      */
     private MonthAccountBook getOrCreateMonthAccountBook(YearMonth month) {
-        // 월이 없으면 새로운 MonthAccountBook 객체를 생성하여 반환
-        return accountBookRecords.computeIfAbsent(month, null);
+        return accountBookRecords.computeIfAbsent(month, MonthAccountBook::new);
     }
+
     /**
      * 거래 내역 추가
      * @param dto 거래 정보 DTO
      */
     public void addTransaction(AccountBookDTO dto) {
         MonthAccountBook monthBook = getOrCreateMonthAccountBook(YearMonth.from(dto.getDate()));
-        //TransactionAccountBook transaction = new TransactionAccountBook(dto.getAmount(), dto.getCategory(), dto.getDescription());
-        //monthBook.addTransaction(dto.getDate(), transaction);
+        TransactionAccountBook transaction = new TransactionAccountBook(dto.getAmount(), dto.getCategory(), dto.getDescription());
+        monthBook.addTransaction(dto.getDate(), transaction);
+        saveMonthAccountBook(monthBook);
     }
 
     /**
@@ -66,10 +69,50 @@ public class AccountBookService {
      * @return 해당 월의 가계부 정보
      */
     public MonthAccountBook getMonthAccountBook(YearMonth month) {
-        // 여기에서 해당 월의 가계부를 처리하는 로직을 구현
-        // 예: MonthAccountBook 객체를 반환 (가계부 데이터를 DB나 메모리에서 가져옴)
-        
-        // 임시로 null 반환 (나중에 실제 데이터 처리 구현 필요)
-        return new MonthAccountBook(); 
+        File file = getMonthAccountBookFile(month);
+        if (!file.exists()) {
+            return new MonthAccountBook(month);
+        }
+        return loadMonthAccountBook(month);
+    }
+
+    /**
+     * 월별 가계부를 파일로 저장 (직렬화 방식)
+     */
+    public void saveMonthAccountBook(MonthAccountBook monthAccountBook) {
+        File file = getMonthAccountBookFile(monthAccountBook.getMonth());
+        file.getParentFile().mkdirs();
+
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+            oos.writeObject(monthAccountBook);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("파일 저장 오류: " + file.getAbsolutePath());
+        }
+    }
+
+    /**
+     * 월별 가계부를 파일에서 로드 (역직렬화 방식)
+     */
+    public MonthAccountBook loadMonthAccountBook(YearMonth month) {
+        File file = getMonthAccountBookFile(month);
+        if (!file.exists()) {
+            return new MonthAccountBook(month);
+        }
+
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+            return (MonthAccountBook) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return new MonthAccountBook(month);
+        }
+    }
+
+    /**
+     * 특정 월의 가계부 파일 경로 반환
+    */
+    private File getMonthAccountBookFile(YearMonth month) {
+        return new File("data/" + month + ".ser");
     }
 }
+

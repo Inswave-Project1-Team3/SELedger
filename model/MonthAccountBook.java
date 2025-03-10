@@ -15,19 +15,16 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MonthAccountBook {
-    /** 해당 월을 나타내는 변수 (예: 2025-03) */
-    private YearMonth month;
+	
+    private YearMonth month; //해당 월 
 
-    /** 해당 월의 총 잔액 (수입 - 지출) */
-    private long totalMoney;
+    private long totalMoney; //총 보유금액
 
-    /** 가장 많이 사용된 카테고리 */
-    private Category maxCategory;
+    private IncomeCategory maxIncomeCategory; //가장 많이 사용된 수입 카테고리
+    
+    private ExpenseCategory maxExpenseCategory; //가장 많이 사용된 수입 카테고리
 
-    /** 
-     * 일별 가계부를 저장하는 맵 (Key: 해당 월의 날짜, Value: 해당 날짜의 가계부)
-     */
-    private Map<Integer, DayAccountBook> dayAccountBookMaps = new HashMap<>();
+    private Map<Integer, DayAccountBook> dayAccountBookMaps = new HashMap<>(); //일별 가계부를 저장(Key: 해당 월의 날짜, Value: 해당 날짜의 가계부)
 
     /**
      * 특정 날짜에 거래 내역을 추가하는 메서드
@@ -35,11 +32,11 @@ public class MonthAccountBook {
      * @param transaction 추가할 거래 내역
      */
     public void addTransaction(LocalDate date, TransactionAccountBook transaction) {
-        int day = date.getDayOfMonth();
-        dayAccountBookMaps.putIfAbsent(day, new DayAccountBook(date));
-        dayAccountBookMaps.get(day).addTransaction(transaction);
-        updateTotalMoney();
-        updateMaxCategory();
+        DayAccountBook dayBook = dayAccountBookMaps.computeIfAbsent(date.getDayOfMonth(), d -> new DayAccountBook());
+        dayBook.addTransaction(transaction);
+
+        // 거래 금액을 반영하여 월별 총 잔액 업데이트
+        updateTotalMoney(transaction.getAmount());
     }
 
     /**
@@ -68,28 +65,38 @@ public class MonthAccountBook {
     }
 
     /**
-     * 월별 총 잔액 업데이트
+     * 월별 총 잔액 업데이트 (거래 내역 추가 시 호출)
+     * @param amount 거래 금액 (양수: 수입, 음수: 지출)
      */
-    private void updateTotalMoney() {
-        totalMoney = dayAccountBookMaps.values().stream()
-                      .mapToLong(DayAccountBook::getNetAmount)
-                      .sum();
+    private void updateTotalMoney(long amount) {
+        this.totalMoney += amount;
     }
 
     /**
      * 가장 많이 사용된 카테고리 업데이트
      */
     private void updateMaxCategory() {
-        Map<Category, Double> categorySums = new HashMap<>();
+    	Map<IncomeCategory, Double> categoryIncomeSum = new HashMap<>();
+        Map<ExpenseCategory, Double> categoryExpenseSum = new HashMap<>();
         for (DayAccountBook book : dayAccountBookMaps.values()) {
             for (TransactionAccountBook transaction : book.getTransactions()) {
-                categorySums.put(transaction.getCategory(),
-                        categorySums.getOrDefault(transaction.getCategory(), 0.0) + transaction.getAmount());
+                categoryIncomeSum.put(transaction.getIncomeCategory(),
+                        categoryIncomeSum.getOrDefault(transaction.getIncomeCategory(), 0.0) + transaction.getAmount());
+                categoryExpenseSum.put(transaction.getExpenseCategory(),
+                        categoryExpenseSum.getOrDefault(transaction.getExpenseCategory(), 0.0) + transaction.getAmount());
             }
         }
-        maxCategory = categorySums.entrySet().stream()
-                      .max(Map.Entry.comparingByValue())
-                      .map(Map.Entry::getKey)
-                      .orElse(null);
+        maxIncomeCategory = categoryIncomeSum.entrySet().stream()
+                      									.max(Map.Entry.comparingByValue())
+                      									.map(Map.Entry::getKey)
+                      									.orElse(null);
+        maxExpenseCategory = categoryExpenseSum.entrySet().stream()
+                										  .max(Map.Entry.comparingByValue())
+                										  .map(Map.Entry::getKey)
+                										  .orElse(null);
     }
+
+	public MonthAccountBook(YearMonth month) {
+		// TODO Auto-generated constructor stub
+	}
 }
