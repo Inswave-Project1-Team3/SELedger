@@ -1,9 +1,20 @@
 package model;
 
-public enum IncomeCategory {
-	   // Income Categories
-	   SALARY,       // 월급
-	   ALLOWANCE,    // 용돈
-	   INVESTMENT,   // 투자 소득
-	   OTHER_INCOME, // 기타 수입
+public enum IncomeCategory implements AccountCategory {
+	SALARY("\uD83D\uDCB0 월급"),
+	BONUS("\uD83C\uDF89 보너스"),
+	INVESTMENT("\uD83D\uDCC8 투자 수익"),
+	ALLOWANCE("\uD83D\uDCB2 용돈");
+
+	private final String description;
+	// Income Categories
+
+	IncomeCategory(String description) {
+		this.description = description;
+	}
+
+	@Override
+	public String getDescription() {
+		return description;
+	}
 }

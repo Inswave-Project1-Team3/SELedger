@@ -1,6 +1,5 @@
 package app;
 
-import java.time.LocalDateTime;
 import java.util.Scanner;
 import DTO.CreateUserDTO;
 import DTO.DeleteUserDTO;
@@ -8,15 +7,13 @@ import DTO.LoginUserDTO;
 import DTO.UpdateUserDTO;
 import contoller.AccountBookController;
 import contoller.UserController;
-import model.ExpenseCategory;
-import model.IncomeCategory;
-import model.MonthAccountBook;
+import model.*;
 import DTO.CreateTransactionAccountBookDTO;
 import DTO.CreateAccountBookDTO;
-import model.DayAccountBook;
 import util.InputValidator;
 import util.StringCheck;
 import view.MainPage;
+import view.AccountBookPage;
 
 /**
  * 애플리케이션 실행을 담당하는 클래스
@@ -35,6 +32,7 @@ public class App {
     public void run() {
         Scanner sc = new Scanner(System.in);
         MainPage mainPage = new MainPage();
+        AccountBookPage accountBookPage = new AccountBookPage();
         StringCheck stringCheck = new StringCheck();
         UserController userController = new UserController();
         AccountBookController accountBookController = new AccountBookController();
@@ -87,14 +85,12 @@ public class App {
 
                 mainPage.userMainPage();
                 mainPage.mainSelect();
-                accountBookController.getMonthAccountBook();
                 int number = stringcheck.numberCheck(sc.next());
                 switch (number) {
                     // 상세 요일 보기
                     case 1:
-                        System.out.println("조회하고 싶은 일수를 입력해주세요");
-                        int month = LocalDateTime.now().getMonthValue();
-                        System.out.println(month);
+                        System.out.println("조회하고 싶은 월수와 일수를 입력해주세요");
+                        int month = stringcheck.numberCheck(sc.next());
                         int day = stringcheck.numberCheck(sc.next());
 
                         accountBookController.getDayAccountBook(month, day);
@@ -102,18 +98,28 @@ public class App {
                         int accountBookNumber = stringcheck.numberCheck(sc.next());
                         switch (accountBookNumber) {
                             case 1:
-                                System.out.println("아래의 값을 순서대로 입력해주세요");
                                 System.out.println("수익이면 0, 지출이면 1");
-                                System.out.println("가격");
-                                System.out.println("메모내용");
                                 boolean benefitCheck = (sc.next().equals("0"));
+
+                                accountBookPage.categoryView(benefitCheck);
+
+                                String input = sc.next().toUpperCase();
+
+                                AccountCategory accountCategory = (benefitCheck) ?
+                                        IncomeCategory.valueOf(input) :
+                                        ExpenseCategory.valueOf(input);
+
+                                accountBookPage.addAccount();
+
                                 long money = sc.nextLong();
                                 String memo = sc.next();
+
                                 accountBookController.createDayAccountBook(
                                         new CreateAccountBookDTO(memo),
-                                        new CreateTransactionAccountBookDTO(benefitCheck, money),
-                                        day);
+                                        new CreateTransactionAccountBookDTO(benefitCheck, money, accountCategory),
+                                        month, day);
                                 break;
+
                             case 2: // 회원정보 수정
                                 System.out.println("현재 비밀번호를 입력하세요:");
                                 String currentPassword = sc.next();

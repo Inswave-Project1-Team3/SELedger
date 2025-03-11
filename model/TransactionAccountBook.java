@@ -13,17 +13,17 @@ public class TransactionAccountBook implements Serializable {
 	private long dayAccountBookId;
 	private String createDate;
 	private String updateDate;
-	private IncomeCategory incomeCategory;
-	private ExpenseCategory expenseCategory;
+	private AccountCategory accountCategory;
 	private boolean benefit;
 	private long money;
 
-	public TransactionAccountBook(boolean benefit, long money) {
+	public TransactionAccountBook(boolean benefit, long money, AccountCategory accountCategory) {
 		this.dayAccountBookId++;
         this.createDate = LocalDateTime.now().withNano(0)
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         this.updateDate = LocalDateTime.now().withNano(0)
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		this.accountCategory = accountCategory;
         this.benefit = benefit;
         this.money = money;
     }
