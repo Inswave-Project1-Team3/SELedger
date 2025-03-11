@@ -22,54 +22,17 @@ public class MonthAccountBook {
 		return month;
 	}
 
-	public void setMonth(YearMonth month) {
-		this.month = month;
-	}
-
 	public long getTotalMoney() {
 		return totalMoney;
-	}
-
-	public void setTotalMoney(long totalMoney) {
-		this.totalMoney = totalMoney;
 	}
 
 	public IncomeCategory getMaxIncomeCategory() {
 		return maxIncomeCategory;
 	}
 
-	public void setMaxIncomeCategory(IncomeCategory maxIncomeCategory) {
-		this.maxIncomeCategory = maxIncomeCategory;
-	}
-
 	public ExpenseCategory getMaxExpenseCategory() {
 		return maxExpenseCategory;
 	}
-
-	public void setMaxExpenseCategory(ExpenseCategory maxExpenseCategory) {
-		this.maxExpenseCategory = maxExpenseCategory;
-	}
-
-	public Map<Integer, DayAccountBook> getDayAccountBookMaps() {
-		return dayAccountBookMaps;
-	}
-
-	public void setDayAccountBookMaps(Map<Integer, DayAccountBook> dayAccountBookMaps) {
-		this.dayAccountBookMaps = dayAccountBookMaps;
-	}
-
-	/**
-     * 특정 날짜에 거래 내역을 추가하는 메서드
-     * @param date 거래가 발생한 날짜
-     * @param transaction 추가할 거래 내역
-     */
-    public void addTransaction(LocalDate date, TransactionAccountBook transaction) {
-        DayAccountBook dayBook = dayAccountBookMaps.computeIfAbsent(date.getDayOfMonth(), d -> new DayAccountBook());
-        dayBook.addTransaction(transaction);
-
-        // 거래 금액을 반영하여 월별 총 잔액 업데이트
-        updateTotalMoney(transaction.getAmount());
-    }
 
     /**
      * 특정 날짜의 가계부 정보를 가져오는 메서드
@@ -78,22 +41,6 @@ public class MonthAccountBook {
      */
     public DayAccountBook getDailyAccountBookInfo(LocalDate date) {
         return dayAccountBookMaps.get(date.getDayOfMonth());
-    }
-
-    /**
-     * 특정 날짜의 총 수입 반환
-     */
-    public double getTotalIncomeByDate(LocalDate date) {
-        DayAccountBook daily = getDailyAccountBookInfo(date);
-        return (daily != null) ? daily.getTotalIncome() : 0;
-    }
-
-    /**
-     * 특정 날짜의 총 지출 반환
-     */
-    public double getTotalExpenseByDate(LocalDate date) {
-        DayAccountBook daily = getDailyAccountBookInfo(date);
-        return (daily != null) ? daily.getTotalExpense() : 0;
     }
 
     /**

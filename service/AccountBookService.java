@@ -1,79 +1,36 @@
 package service;
 
-import lombok.RequiredArgsConstructor;
+import DTO.CreateAccountBookDTO;
+import DTO.CreateTransactionAccountBookDTO;
 import model.DayAccountBook;
 import model.MonthAccountBook;
 import model.TransactionAccountBook;
 
 import java.io.*;
-import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import DTO.AccountBookDTO;
+import static app.App.dayAccountBookMap;
+import static app.App.monthAccountBook;
 
-@RequiredArgsConstructor
 public class AccountBookService implements Serializable {
     private static final long serialVersionUID = 1L;
-    /** 월별 가계부 저장소 */
+    /**
+     * 월별 가계부 저장소
+     */
     private Map<YearMonth, MonthAccountBook> accountBookRecords = new HashMap<>();
 
     /**
      * 특정 월의 가계부 가져오기 (없으면 생성)
+     *
      * @param month 조회할 월
      * @return 해당 월의 가계부
      */
     private MonthAccountBook getOrCreateMonthAccountBook(YearMonth month) {
         return accountBookRecords.computeIfAbsent(month, MonthAccountBook::new);
-    }
-
-    /**
-     * 거래 내역 추가
-     * @param dto 거래 정보 DTO
-     */
-    public void addTransaction(AccountBookDTO dto) {
-        MonthAccountBook monthBook = getOrCreateMonthAccountBook(YearMonth.from(dto.getDate()));
-        TransactionAccountBook transaction = new TransactionAccountBook(0, false, null, null, null, null, false, 0);
-        monthBook.addTransaction(dto.getDate(), transaction);
-        saveMonthAccountBook(monthBook);
-    }
-
-    /**
-     * 특정 날짜의 가계부 조회
-     */
-    public DayAccountBook getDailyAccountBookInfo(LocalDate date) {
-        MonthAccountBook monthBook = accountBookRecords.get(YearMonth.from(date));
-        return (monthBook != null) ? monthBook.getDailyAccountBookInfo(date) : null;
-    }
-
-    /**
-     * 특정 날짜의 총 수입 반환
-     */
-    public double getTotalIncomeByDate(LocalDate date) {
-        MonthAccountBook monthBook = accountBookRecords.get(YearMonth.from(date));
-        return (monthBook != null) ? monthBook.getTotalIncomeByDate(date) : 0;
-    }
-
-    /**
-     * 특정 날짜의 총 지출 반환
-     */
-    public double getTotalExpenseByDate(LocalDate date) {
-        MonthAccountBook monthBook = accountBookRecords.get(YearMonth.from(date));
-        return (monthBook != null) ? monthBook.getTotalExpenseByDate(date) : 0;
-    }
-    
-    /**
-     * 특정 월의 가계부 조회
-     * @param month 조회할 월
-     * @return 해당 월의 가계부 정보
-     */
-    public MonthAccountBook getMonthAccountBook(YearMonth month) {
-        File file = getMonthAccountBookFile(month);
-        if (!file.exists()) {
-            return new MonthAccountBook(month);
-        }
-        return loadMonthAccountBook(month);
     }
 
     /**
@@ -110,64 +67,53 @@ public class AccountBookService implements Serializable {
 
     /**
      * 특정 월의 가계부 파일 경로 반환
-    */
+     */
     private File getMonthAccountBookFile(YearMonth month) {
         return new File("data/" + month + ".ser");
     }
-import DTO.CreateAccountBookDTO;
-import DTO.CreateTransactionAccountBookDTO;
-import model.DayAccountBook;
-import model.TransactionAccountBook;
 
-import java.io.*;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import static app.App.dayAccountBookMap;
 
-public class AccountBookService {
 
-    public void createAccountBook(CreateAccountBookDTO accountBookDTO, CreateTransactionAccountBookDTO transactionAccountBookDTO) {
+    // 선택한 날의 가계부 생성
+    public void createAccountBook(CreateAccountBookDTO accountBookDTO,
+                                  CreateTransactionAccountBookDTO transactionAccountBookDTO,
+                                  int day) {
         getToFile();
-
-        int day = LocalDateTime.now().getDayOfMonth();
 
         TransactionAccountBook transactionAccountBook = new TransactionAccountBook(
                 transactionAccountBookDTO.isBenefit(),
                 transactionAccountBookDTO.getMoney()
         );
 
-        List<TransactionAccountBook> list = dayAccountBookMap.get(day).getTransactionAccountBooks();
+        List<TransactionAccountBook> list = (dayAccountBookMap.get(day) == null) ?
+                        new ArrayList<>() : dayAccountBookMap.get(day).getTransactionAccountBooks();
         list.add(transactionAccountBook);
+
         DayAccountBook dayAccountBook = new DayAccountBook(accountBookDTO.getMemo(), list);
+
         dayAccountBookMap.put(day, dayAccountBook);
-
-        // 출력
-        for(int i = 0; i < dayAccountBookMap.get(day).getTransactionAccountBooks().size(); i++){
-            System.out.println(dayAccountBookMap.get(day).getTransactionAccountBooks().get(i).getMoney() +
-            ", " + dayAccountBookMap.get(day).getTransactionAccountBooks().get(i).getCreateDate() + ", " +
-                    dayAccountBookMap.get(day).getTransactionAccountBooks().get(i).isBenefit());
-        }
-
-        System.out.println("메모내용 : " + dayAccountBookMap.get(day).getMemo());
+        monthAccountBook.put(3, dayAccountBookMap);
 
         saveToFile();
-}
+    }
 
 
     private void saveToFile() {
         try (FileOutputStream fileOut = new FileOutputStream("C:\\Temp\\day_account_book.ser");
              ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
 
-            out.writeObject(dayAccountBookMap);  // Map 전체를 직렬화하여 저장
+            out.writeObject(dayAccountBookMap);
+            out.writeObject(monthAccountBook);
             System.out.println("등록되었습니다.");
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    // 지정된 위치의 일일 거래내역 가져오기
+    // 저장위치 바뀌면 파라미터 값으로 전달 후 조절하면 될듯합니다
     public void getToFile() {
         File file = new File("C:\\Temp\\day_account_book.ser");
         if (!file.exists()) {
@@ -181,8 +127,48 @@ public class AccountBookService {
             // 데이터를 읽어온 후 null 체크
             Object obj = in.readObject();
             dayAccountBookMap = (obj instanceof Map) ? (Map<Integer, DayAccountBook>) obj : new HashMap<>();
+
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public void getDayAccountBook(int number){
+        getToFile();
+
+        System.out.println("📅 " + number + "일 가계부");
+        if(!(dayAccountBookMap.get(number) == null)) {
+            for (int i = 0; i < dayAccountBookMap.get(number).getTransactionAccountBooks().size(); i++) {
+                System.out.println(dayAccountBookMap.get(number).getTransactionAccountBooks().get(i).getMoney() +
+                        ", " + dayAccountBookMap.get(number).getTransactionAccountBooks().get(i).getCreateDate() + ", " +
+                        dayAccountBookMap.get(number).getTransactionAccountBooks().get(i).isBenefit());
+            }
+        System.out.println("메모내용 : " + dayAccountBookMap.get(number).getMemo());
+        }
+
+        else{
+            dayAccountBookMap = new HashMap<>();
+        }
+    }
+
+    public void getMonthAccountBook(){
+        getToFile();
+        System.out.println("📅 " + "3월 가계부");
+        for (Map.Entry<Integer, Map<Integer, DayAccountBook>> entry : monthAccountBook.entrySet()) {
+            Integer month = entry.getKey();
+            Map<Integer, DayAccountBook> dailyAccountBook = entry.getValue();
+
+            // 월별 값
+            for (Map.Entry<Integer, DayAccountBook> dayEntry : dailyAccountBook.entrySet()) {
+                Integer day = dayEntry.getKey();
+                List<TransactionAccountBook> transactionAccountBooks = dayEntry.getValue().getTransactionAccountBooks();
+                for(TransactionAccountBook transactionAccountBook : transactionAccountBooks){
+                    System.out.println("Month: " + month +
+                            ", Day: " + day +
+                            ", money: " + transactionAccountBook.getMoney() +
+                            ", benefit : " + transactionAccountBook.isBenefit());
+                }
+            }
         }
     }
 }
