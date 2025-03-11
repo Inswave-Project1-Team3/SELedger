@@ -2,9 +2,7 @@ package service;
 
 import DTO.CreateAccountBookDTO;
 import DTO.CreateTransactionAccountBookDTO;
-import model.DayAccountBook;
-import model.MonthAccountBook;
-import model.TransactionAccountBook;
+import model.*;
 
 import java.io.*;
 import java.time.LocalDateTime;
@@ -20,29 +18,24 @@ public class AccountBookService implements Serializable {
     // 선택한 날의 가계부 생성
     public void createAccountBook(CreateAccountBookDTO accountBookDTO,
                                   CreateTransactionAccountBookDTO transactionAccountBookDTO,
-                                  int day) {
-        int month = LocalDateTime.now().getMonthValue();
+                                  int month, int day) {
 
+        // 저장된 파일 가져오기
         Map<Integer, Map<Integer, DayAccountBook>> monthAccountBook = getToFile();
-
+        // 저장된 월이 존재하지 않는다면 monthAccountBook 생성
         if (!monthAccountBook.containsKey(month)) monthAccountBook.put(month, new HashMap<>());
 
         Map<Integer, DayAccountBook> dayAccountBookMap = monthAccountBook.get(month);
 
+
         TransactionAccountBook transactionAccountBook = new TransactionAccountBook(
                 transactionAccountBookDTO.isBenefit(),
-                transactionAccountBookDTO.getMoney()
-        );
+                transactionAccountBookDTO.getMoney(),
+                transactionAccountBookDTO.getAccountCategory());
 
-        List<TransactionAccountBook> list;
-
-        if (!dayAccountBookMap.containsKey(day)) {
-            list = new ArrayList<>();
-        } else {
-            DayAccountBook dayAccountBook = dayAccountBookMap.get(day);
-            list = (dayAccountBook.getTransactionAccountBooks() != null) ?
-                    dayAccountBook.getTransactionAccountBooks() : new ArrayList<>();
-        }
+        List<TransactionAccountBook> list = (dayAccountBookMap.containsKey(day)) ?
+                dayAccountBookMap.get(day).getTransactionAccountBooks() :
+                new ArrayList<>();
 
         list.add(transactionAccountBook);
 
@@ -101,7 +94,8 @@ public class AccountBookService implements Serializable {
             for (int i = 0; i < dayAccountBook.getTransactionAccountBooks().size(); i++) {
                 System.out.println(dayAccountBook.getTransactionAccountBooks().get(i).getMoney() +
                         ", " + dayAccountBook.getTransactionAccountBooks().get(i).getCreateDate() + ", " +
-                        dayAccountBook.getTransactionAccountBooks().get(i).isBenefit());
+                        dayAccountBook.getTransactionAccountBooks().get(i).isBenefit() + ", " +
+                        dayAccountBook.getTransactionAccountBooks().get(i).getAccountCategory().getDescription());
             }
             System.out.println("메모내용 : " + dayAccountBook.getMemo());
         } else {
@@ -109,29 +103,13 @@ public class AccountBookService implements Serializable {
         }
     }
 
-    public void getMonthAccountBook() {
+    public Map<Integer, DayAccountBook> getMonthAccountBook(int month) {
         Map<Integer, Map<Integer, DayAccountBook>> monthAccountBook = getToFile();
-        int currentMonth = LocalDateTime.now().getMonthValue();
-        System.out.println("📅 " + currentMonth +"월 가계부");
 
-        for (Map.Entry<Integer, Map<Integer, DayAccountBook>> entry : monthAccountBook.entrySet()) {
-            Integer month = entry.getKey();
-            Map<Integer, DayAccountBook> dayAccountBookMap = entry.getValue();  // Map<Integer, DayAccountBook> 추출
 
-            System.out.println(month + "월:");
-
-            // 일별로 DayAccountBook을 출력
-            for (Map.Entry<Integer, DayAccountBook> dayEntry : dayAccountBookMap.entrySet()) {
-                Integer day = dayEntry.getKey();
-                DayAccountBook dayAccountBook = dayEntry.getValue();
-
-                System.out.println("  " + day + "일 메모: " + dayAccountBook.getMemo());
-                for (TransactionAccountBook transactionAccountBook : dayAccountBook.getTransactionAccountBooks()) {
-                    System.out.println("    가격: " + transactionAccountBook.getMoney());
-                    System.out.println("         수익여부: " + transactionAccountBook.isBenefit());
-                }
-            }
+        return (monthAccountBook.containsKey(month)) ?
+                monthAccountBook.get(month) : new HashMap<>();
         }
     }
-}
+
 
