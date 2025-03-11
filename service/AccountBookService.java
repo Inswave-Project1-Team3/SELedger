@@ -89,24 +89,11 @@ public class AccountBookService implements Serializable {
     }
 
 
-    public void getDayAccountBook(int month, int day, String userNickName) {
+    public DayAccountBook getDayAccountBook(int month, int day, String userNickName) {
         Map<Integer, DayAccountBook> monthAccountBook = getToFile(month, userNickName);
 
-        System.out.println("📅 " + month +" 월 "+ day + "일 가계부");
-        DayAccountBook dayAccountBook = (monthAccountBook.containsKey(day)) ?
-                monthAccountBook.get(day) : new DayAccountBook();
+        return (monthAccountBook.containsKey(day)) ? monthAccountBook.get(day) : new DayAccountBook();
 
-        if (dayAccountBook != null) {
-            for (int i = 0; i < dayAccountBook.getTransactionAccountBooks().size(); i++) {
-                System.out.println(dayAccountBook.getTransactionAccountBooks().get(i).getMoney() +
-                        ", " + dayAccountBook.getTransactionAccountBooks().get(i).getCreateDate() + ", " +
-                        dayAccountBook.getTransactionAccountBooks().get(i).isBenefit() + ", " +
-                        dayAccountBook.getTransactionAccountBooks().get(i).getAccountCategory().getDescription());
-            }
-            System.out.println("메모내용 : " + dayAccountBook.getMemo());
-        } else {
-            monthAccountBook.put(day, new DayAccountBook());
-        }
     }
     public Map<Integer,DayMoney> getMonthMoney(String userNickName){
         Map<Integer, DayAccountBook> monthAccountBook = getToFile(month, userNickName);

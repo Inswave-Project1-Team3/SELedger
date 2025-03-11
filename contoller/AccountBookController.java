@@ -3,6 +3,7 @@ package contoller;
 import DTO.CreateAccountBookDTO;
 import DTO.CreateTransactionAccountBookDTO;
 import lombok.RequiredArgsConstructor;
+import model.DayAccountBook;
 import model.DayMoney;
 import service.AccountBookService;
 import java.util.Map;
@@ -21,8 +22,8 @@ public class AccountBookController {
     }
 
     // 특정 날짜의 가계부 가져오기
-    public void getDayAccountBook(int month, int day, String userNickName){
-        accountBookService.getDayAccountBook(month, day, userNickName);
+    public DayAccountBook getDayAccountBook(int month, int day, String userNickName){
+        return accountBookService.getDayAccountBook(month, day, userNickName);
     }
 
     public Map<Integer, DayMoney> getMonthMoney(String userNickName){

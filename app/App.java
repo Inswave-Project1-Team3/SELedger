@@ -98,8 +98,8 @@ public class App {
                         month = stringcheck.numberCheck(sc.next());
                         int day = stringcheck.numberCheck(sc.next());
 
-                        accountBookController.getDayAccountBook(month, day, userNickName);
-                        mainPage.DayAccountBookPage();
+                        DayAccountBook dayAccountBook = accountBookController.getDayAccountBook(month, day, userNickName);
+                        accountBookPage.DayAccountBookPage(dayAccountBook, month, day);
                         int accountBookNumber = stringcheck.numberCheck(sc.next());
                         switch (accountBookNumber) {
                             case 1:
