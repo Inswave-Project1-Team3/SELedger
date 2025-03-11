@@ -1,5 +1,6 @@
 package app;
 
+import java.time.LocalDateTime;
 import java.util.Scanner;
 import DTO.CreateUserDTO;
 import DTO.DeleteUserDTO;
@@ -27,6 +28,9 @@ public class App {
     
     //현재 로그인한 사용자의 닉네임
     public static String userNickName = "";
+
+    public static int year = LocalDateTime.now().getYear();
+    public static int month = LocalDateTime.now().getMonthValue();
 
     //애플리케이션 실행 메서드
     public void run() {
@@ -83,14 +87,15 @@ public class App {
                 }
             } else {  // 로그인된 경우
 
-                mainPage.userMainPage();
+                accountBookPage.accountMainPage(accountBookController.getMonthMoney(userNickName));
+
                 mainPage.mainSelect();
                 int number = stringcheck.numberCheck(sc.next());
                 switch (number) {
                     // 상세 요일 보기
                     case 1:
                         System.out.println("조회하고 싶은 월수와 일수를 입력해주세요");
-                        int month = stringcheck.numberCheck(sc.next());
+                        month = stringcheck.numberCheck(sc.next());
                         int day = stringcheck.numberCheck(sc.next());
 
                         accountBookController.getDayAccountBook(month, day, userNickName);
