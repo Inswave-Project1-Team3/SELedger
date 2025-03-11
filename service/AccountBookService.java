@@ -43,16 +43,14 @@ public class AccountBookService implements Serializable {
 
     private void saveToFile (Map<Integer, DayAccountBook> monthAccountBook, int month, String userNickName) {
         // 저장할 경로 설정
-//        String directoryPath = (USER_DATA_FOLDER + File.separator + userNickName + File.separator + "calendar" + File.separator + month + ".ser");
-//        File directory = new File(directoryPath);
-//
-//        if (!directory.exists()) {
-//            directory.mkdirs(); // 상위 디렉터리까지 포함해 전체 생성
-//        }
+        String directoryPath = USER_DATA_FOLDER + File.separator + userNickName + File.separator + "calendar";
+        File directory = new File(directoryPath);
 
+        if (!directory.exists()) {
+            directory.mkdirs(); // 상위 디렉터리까지 포함해 전체 생성
+        }
 
-
-        try (FileOutputStream fileOut = new FileOutputStream("C:\\Temp\\day_account_book.ser");
+        try (FileOutputStream fileOut = new FileOutputStream(USER_DATA_FOLDER + File.separator + userNickName + File.separator + "calendar" + File.separator + month + ".ser");
              ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
 
             out.writeObject(monthAccountBook);
@@ -66,7 +64,7 @@ public class AccountBookService implements Serializable {
     // 지정된 위치의 거래내역 가져오기
     public  Map<Integer, DayAccountBook> getToFile(int month, String userNickName) {
 //        String directoryPath = (USER_DATA_FOLDER + File.separator + userNickName + File.separator + "calendar" + File.separator + month + ".ser");
-        File file = new File("C:\\Temp\\day_account_book.ser");
+        File file = new File(USER_DATA_FOLDER + File.separator + userNickName + File.separator + "calendar" + File.separator + month + ".ser");
 
 //        File file = new File(directoryPath);
 //        if (!file.exists()) {
