@@ -93,7 +93,7 @@ public class App {
                         int month = stringcheck.numberCheck(sc.next());
                         int day = stringcheck.numberCheck(sc.next());
 
-                        accountBookController.getDayAccountBook(month, day);
+                        accountBookController.getDayAccountBook(month, day, userNickName);
                         mainPage.DayAccountBookPage();
                         int accountBookNumber = stringcheck.numberCheck(sc.next());
                         switch (accountBookNumber) {
@@ -117,7 +117,7 @@ public class App {
                                 accountBookController.createDayAccountBook(
                                         new CreateAccountBookDTO(memo),
                                         new CreateTransactionAccountBookDTO(benefitCheck, money, accountCategory),
-                                        month, day);
+                                        month, day, userNickName);
                                 break;
 
                             case 2: // 회원정보 수정
