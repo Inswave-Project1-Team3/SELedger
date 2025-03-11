@@ -185,7 +185,7 @@ public class UserController {
 	 * 현재 로그인된 사용자의 탈퇴 처리를 하고 결과를 반환합니다.
 	 * 로그인 상태가 아니거나 다른 사용자를 탈퇴시키려는 경우 실패합니다.
 	 * 탈퇴 성공 시 자동으로 로그아웃 처리됩니다.
-	 * 사용자 폴더는 삭제하지 않고 유지됩니다.
+	 * 사용자 폴더와 데이터는 삭제하지 않고 유지됩니다.
 	 * 
 	 * @param dto 회원탈퇴 정보를 담은 DTO
 	 * @return 탈퇴 결과 (성공: true, 실패: false)
@@ -203,7 +203,8 @@ public class UserController {
 			// 탈퇴 성공 시 로그아웃 처리
 			logout();
 			System.out.println("회원탈퇴가 성공적으로 처리되었습니다.");
-			System.out.println("사용자 폴더는 데이터 관리를 위해 유지됩니다.");
+			System.out.println("사용자 폴더와 데이터는 유지됩니다.");
+			System.out.println("계정 복구를 원하시면 관리자에게 문의하세요. (관리자 이메일: LOVE@inswave.com)");
 		} else
 			System.out.println("회원탈퇴에 실패했습니다. 비밀번호를 확인해주세요.");
 		

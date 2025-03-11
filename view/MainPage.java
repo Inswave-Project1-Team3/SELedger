@@ -174,7 +174,7 @@ public class MainPage {
 	}
 
 	public void mainSelect() {
-		System.out.println("1. 상세요일 보기, 2. 친구 가계부 보기, 9. 로그아웃");
+		System.out.println("1. 상세요일 보기/2. 친구 가계부 보기/3. 회원정보 조회/4. 회원정보 수정/8. 회원탈퇴/9. 로그아웃/0. 프로그램 종료");
 	}
 	public void DayAccountBookPage() {
 		// 일일 거래내역 전체 return

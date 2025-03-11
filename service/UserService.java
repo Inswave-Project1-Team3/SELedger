@@ -131,6 +131,7 @@ public class UserService {
 	 * 로그인
 	 *
 	 * 이메일과 비밀번호를 검증하여 로그인을 처리합니다.
+	 * 탈퇴한 회원이 로그인 시도 시 안내 메시지를 출력합니다.
 	 *
 	 * @param dto 로그인 정보를 담은 DTO
 	 * @return 로그인 결과 (성공: true, 실패: false)
@@ -146,6 +147,14 @@ public class UserService {
 		// 사용자가 존재하면 로그인 시도
 		if (userOpt.isPresent()) {
 			User user = userOpt.get();
+			
+			// 탈퇴한 회원인 경우
+			if (user.isDeleted()) {
+				System.out.println("탈퇴한 회원입니다. 계정 복구를 원하시면 관리자에게 문의하세요.");
+				System.out.println("관리자 이메일: LOVE@inswave.com");
+				return false;
+			}
+			
 			return user.loginUser(dto.getEmail(), dto.getPassword());
 		}
 

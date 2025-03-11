@@ -115,11 +115,7 @@ public class User implements Serializable {
 	 * @return 로그인 성공 여부 (true: 성공, false: 실패)
 	 */
 	public boolean loginUser(String email, String password) {
-		// 탈퇴한 사용자는 로그인 불가
-		if (this.deleteCheck)
-			return false;
-		
-		// 이메일과 비밀번호 확인
+		// 이메일과 비밀번호 확인 (탈퇴 여부는 UserService에서 확인)
 		return this.email.equals(email) && this.password.equals(encryptPassword(password));
 	}
 

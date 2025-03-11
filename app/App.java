@@ -119,46 +119,6 @@ public class App {
                                         new CreateTransactionAccountBookDTO(benefitCheck, money, accountCategory),
                                         month, day);
                                 break;
-
-                            case 2: // 회원정보 수정
-                                System.out.println("현재 비밀번호를 입력하세요:");
-                                String currentPassword = sc.next();
-                                
-                                System.out.println("새 이메일을 입력하세요 (변경하지 않으려면 'skip' 입력):");
-                                String newEmail = sc.next();
-                                if (newEmail.equalsIgnoreCase("skip"))
-                                    newEmail = null;
-                                else if (!InputValidator.isValidEmail(newEmail)) {
-                                    System.out.println("이메일 형식이 올바르지 않습니다.");
-                                    break;
-                                }
-                                
-                                System.out.println("새 비밀번호를 입력하세요 (8자리 이상, 특수문자 포함, 변경하지 않으려면 'skip' 입력):");
-                                String newPassword = sc.next();
-                                if (newPassword.equalsIgnoreCase("skip"))
-                                    newPassword = null;
-                                else if (!InputValidator.isValidPassword(newPassword)) {
-                                    System.out.println("새 비밀번호는 8자리 이상이며, 최소 하나 이상의 특수문자를 포함해야 합니다.");
-                                    break;
-                                }
-                                
-                                // 닉네임은 변경할 수 없으므로 null로 설정
-                                String newNickname = null;
-                                System.out.println("닉네임은 변경할 수 없습니다. 회원가입 시 설정한 닉네임이 유지됩니다.");
-                                
-                                userController.updateUser(new UpdateUserDTO(userEmail, currentPassword, newEmail, newPassword, newNickname));
-                                break;
-                            case 3: // 회원탈퇴
-                                System.out.println("정말 탈퇴하시겠습니까? (Y/N)");
-                                String confirm = sc.next();
-                                
-                                if (confirm.equalsIgnoreCase("Y")) {
-                                    System.out.println("비밀번호를 입력하세요:");
-                                    String password = sc.next();
-                                    
-                                    userController.deleteUser(new DeleteUserDTO(userEmail, password));
-                                }
-                                break;
                             case 9: // 뒤로가기
                                 // 아무 작업 없이 상세 요일 보기 메뉴를 빠져나감
                                 System.out.println("메인 메뉴로 돌아갑니다.");
@@ -174,6 +134,68 @@ public class App {
                         // 기존 코드 유지
                         break;
                         
+                    // 회원정보 조회
+                    case 3:
+                        // 현재 로그인한 사용자 정보 조회
+                        User currentUser = userController.getCurrentUser();
+                        if (currentUser != null) {
+                            System.out.println("\n----- 회원정보 -----");
+                            System.out.println("이메일: " + currentUser.getEmail());
+                            System.out.println("닉네임: " + currentUser.getNickName());
+                            System.out.println("회원상태: " + (currentUser.isDeleted() ? "탈퇴" : "활성"));
+                            System.out.println("-------------------\n");
+                        } else {
+                            System.out.println("회원정보를 조회할 수 없습니다.");
+                        }
+                        break;
+                        
+                    // 회원정보 수정
+                    case 4:
+                        System.out.println("\n----- 회원정보 수정 -----");
+                        System.out.println("현재 비밀번호를 입력하세요:");
+                        String currentPassword = sc.next();
+                        
+                        System.out.println("새 이메일을 입력하세요 (변경하지 않으려면 'skip' 입력):");
+                        String newEmail = sc.next();
+                        if (newEmail.equalsIgnoreCase("skip"))
+                            newEmail = null;
+                        else if (!InputValidator.isValidEmail(newEmail)) {
+                            System.out.println("이메일 형식이 올바르지 않습니다.");
+                            break;
+                        }
+                        
+                        System.out.println("새 비밀번호를 입력하세요 (8자리 이상, 특수문자 포함, 변경하지 않으려면 'skip' 입력):");
+                        String newPassword = sc.next();
+                        if (newPassword.equalsIgnoreCase("skip"))
+                            newPassword = null;
+                        else if (!InputValidator.isValidPassword(newPassword)) {
+                            System.out.println("새 비밀번호는 8자리 이상이며, 최소 하나 이상의 특수문자를 포함해야 합니다.");
+                            break;
+                        }
+                        
+                        // 닉네임은 변경할 수 없으므로 null로 설정
+                        String newNickname = null;
+                        System.out.println("닉네임은 변경할 수 없습니다. 회원가입 시 설정한 닉네임이 유지됩니다.");
+                        
+                        userController.updateUser(new UpdateUserDTO(userEmail, currentPassword, newEmail, newPassword, newNickname));
+                        break;
+                        
+                    // 회원탈퇴
+                    case 8:
+                        System.out.println("\n----- 회원탈퇴 -----");
+                        System.out.println("정말 탈퇴하시겠습니까? (Y/N)");
+                        String confirm = sc.next();
+                        
+                        if (confirm.equalsIgnoreCase("Y")) {
+                            System.out.println("비밀번호를 입력하세요:");
+                            String password = sc.next();
+                            
+                            userController.deleteUser(new DeleteUserDTO(userEmail, password));
+                        } else {
+                            System.out.println("회원탈퇴가 취소되었습니다.");
+                        }
+                        break;
+                        
                     // 로그아웃
                     case 9:
                         userController.logout();
@@ -185,6 +207,9 @@ public class App {
                         System.out.println("프로그램을 종료합니다.");
                         sc.close();
                         return;
+                        
+                    default:
+                        System.out.println("화면에 표시된 값만 입력하실 수 있습니다.");
                 }
             }
         }
