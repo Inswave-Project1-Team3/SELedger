@@ -1,11 +1,11 @@
 package view;
 
-import model.DayMoney;
 
+import model.DayAccountBook;
+import model.DayMoney;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Map;
-
 import static app.App.month;
 import static app.App.year;
 
@@ -71,8 +71,8 @@ public class AccountBookPage {
         String[] cell = new String[CELL_HEIGHT];
         cell[0] = String.valueOf(day);
         if (data != null) {
-            cell[1] = "In: " + data.getIncome();
-            cell[2] = "Out: " + data.getExpense();
+            cell[1] = " + " + data.getIncome();
+            cell[2] = " - " + data.getExpense();
         } else {
             cell[1] = "";
             cell[2] = "";
@@ -115,7 +115,7 @@ public class AccountBookPage {
 
     public void categoryView(boolean benefitCheck) {
         System.out.println("카테고리");
-        if (benefitCheck) {
+        if(benefitCheck) {
             System.out.println("SALARY : 월급");
             System.out.println("BONUS : 보너스");
             System.out.println("INVESTMENT : 투자수익");
@@ -129,9 +129,27 @@ public class AccountBookPage {
         }
     }
 
-    public void addAccount() {
+    public void addAccount(){
         System.out.println("아래의 값을 순서대로 입력해주세요");
         System.out.println("1. 가격");
         System.out.println("2. 메모내용");
     }
+
+    public void DayAccountBookPage(DayAccountBook dayAccountBook, int month, int day) {
+        System.out.println("📅 " + month +" 월 "+ day + "일 가계부");
+        if (dayAccountBook != null) {
+            for (int i = 0; i < dayAccountBook.getTransactionAccountBooks().size(); i++) {
+                System.out.println(dayAccountBook.getTransactionAccountBooks().get(i).getMoney() +", " +
+                        dayAccountBook.getTransactionAccountBooks().get(i).getCreateDate() + ", " +
+                        dayAccountBook.getTransactionAccountBooks().get(i).isBenefit() + ", " +
+                        dayAccountBook.getTransactionAccountBooks().get(i).getAccountCategory().getDescription());
+            }
+            System.out.println("메모내용 : " + dayAccountBook.getMemo());
+        } else {
+            System.out.println("내역이 없습니다");
+        }
+        System.out.println("1. 내역 추가, 2. 댓글달기, 9. 뒤로가기");
+
+    }
+
 }
