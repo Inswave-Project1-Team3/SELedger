@@ -20,11 +20,11 @@ public class AccountBookController {
     }
 
     // 특정 날짜의 가계부 가져오기
-    public void getDayAccountBook(int number){
-        accountBookService.getDayAccountBook(number);
+    public void getDayAccountBook(int month, int day){
+        accountBookService.getDayAccountBook(month, day);
     }
 
-    public void getMontAccountBook(){
+    public void getMonthAccountBook(){
         accountBookService.getMonthAccountBook();
     }
 }

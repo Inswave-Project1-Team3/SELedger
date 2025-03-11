@@ -1,7 +1,6 @@
 package app;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.time.LocalDateTime;
 import java.util.Scanner;
 import DTO.CreateUserDTO;
 import DTO.DeleteUserDTO;
@@ -31,9 +30,6 @@ public class App {
     
     //현재 로그인한 사용자의 닉네임
     public static String userNickName = "";
-
-    public static Map<Integer, DayAccountBook> dayAccountBookMap = new HashMap<>();
-    public static Map<Integer, Map<Integer, DayAccountBook>> monthAccountBook = new HashMap<>();
 
     //애플리케이션 실행 메서드
     public void run() {
@@ -91,14 +87,17 @@ public class App {
 
                 mainPage.userMainPage();
                 mainPage.mainSelect();
-                accountBookController.getMontAccountBook();
+                accountBookController.getMonthAccountBook();
                 int number = stringcheck.numberCheck(sc.next());
                 switch (number) {
                     // 상세 요일 보기
                     case 1:
                         System.out.println("조회하고 싶은 일수를 입력해주세요");
+                        int month = LocalDateTime.now().getMonthValue();
+                        System.out.println(month);
                         int day = stringcheck.numberCheck(sc.next());
-                        accountBookController.getDayAccountBook(day);
+
+                        accountBookController.getDayAccountBook(month, day);
                         mainPage.DayAccountBookPage();
                         int accountBookNumber = stringcheck.numberCheck(sc.next());
                         switch (accountBookNumber) {
