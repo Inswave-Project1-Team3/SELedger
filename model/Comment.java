@@ -1,53 +1,66 @@
 package model;
 
 import java.io.Serializable;
-import java.util.Date;
 
-/**
- * 댓글 정보 관리 클래스
- */
-public class Comment implements Serializable {
-	// 댓글 생성 시간
-	public Date commentDate;
+public class Comment implements Serializable{
+	private String id; //게시판 주인의 아이디
+	private String context;
+	private int month;  //enum 열거 타입 
+	private int day; //날짜 검색 기능을 추가할 경우 Day day로 변경
 	
-	// 댓글 수정 시간
-	public Date updateDate;
 	
-	// 게시글 주인 닉네임
-	public String ownerwriterNickName;
-	
-	// 댓글 작성자 닉네임
-	public String writerNickName;
-	
-	// 댓글 내용
-	public String context;
-	
-	/**
-	 * 기본 생성자
-	 */
-	public Comment() {
-	}
-
-	/**
-	 * 댓글 생성 생성자
-	 */
-	public Comment(String writerNickName, String context, Date now) {
-		this.writerNickName = writerNickName;
+	public Comment(String id, String context, int month, int day) {
+		super();
+		this.id = id;
 		this.context = context;
-		this.commentDate = now;
+		this.month = month;
+		this.day = day;
 	}
+
+
+	public String getId() {
+		return id;
+	}
+
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+
+	public String getcontext() {
+		return context;
+	}
+
+
+	public void setcontext(String context) {
+		this.context = context;
+	}
+
+
+	public int getMonth() {
+		return month;
+	}
+
+
+	public void setMonth(int month) {
+		this.month = month;
+	}
+
+
+	public int getday() {
+		return day;
+	}
+
+
+	public void setday(int day) {
+		this.day = day;
+	}
+
 
 	@Override
 	public String toString() {
-		return "Comment [commentDate=" + commentDate + ", updateDate=" + updateDate + ", writerNickName=" + writerNickName
-				+ ", context=" + context + "]";
+		return "Customer [id=" + id + ", context=" + context + ", month=" + month + ", day=" + day + "]";
 	}
 
-	/**
-	 * 댓글 내용 수정
-	 */
-	public void update(String updateComment) {
-		this.context = updateComment;
-		this.updateDate = new Date();
-	}
 }
