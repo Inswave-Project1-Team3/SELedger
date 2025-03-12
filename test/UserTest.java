@@ -33,7 +33,8 @@ public class UserTest {
 		boolean running = true;
 		while (running) {
 			printMenu();
-			int choice = getIntInput("메뉴 선택: ");
+//			int choice = getIntInput("메뉴 선택: ");
+			int choice = 1;
 			
 			switch (choice) {
 				case 1:
@@ -278,10 +279,10 @@ public class UserTest {
 	 * @param prompt 입력 안내 메시지
 	 * @return 입력받은 정수
 	 */
-	private static int getIntInput(String prompt) {
-		System.out.print(prompt);
-		return stringCheck.getValidNumber(scanner);
-	}
+//	private static int getIntInput(String prompt) {
+//		System.out.print(prompt);
+//		return stringCheck.getValidNumber(scanner);
+//	}
 	
 	/**
 	 * 유효성 검증을 포함한 문자열 입력 받기

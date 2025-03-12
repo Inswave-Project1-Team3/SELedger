@@ -48,7 +48,7 @@ public class App {
         while (true) {
             if (!loginCheck) {
                 mainPage.anonymousMainPage();
-                int number = stringCheck.numberCheck(sc.next());
+                int number = stringCheck.numberCheck(sc);
 
                 switch (number) {
                     case 1:
@@ -106,7 +106,7 @@ public class App {
         accountBookPage.accountMainPage(vo);
 
         System.out.println("1. 상세요일 보기/2. 친구 가계부 보기/3. 회원정보 조회/4. 회원정보 수정 /7. 뒤로가기/8. 회원탈퇴/9. 로그아웃/0. 프로그램 종료");
-        int number = stringcheck.numberCheck(sc.next());
+        int number = stringcheck.numberCheck(sc);
 
         switch (number) {
             case 1:
@@ -122,9 +122,12 @@ public class App {
                 updateUser();
                 break;
             case 7:
+                userNickName = "";
                 visitUserNickname = "";
                 break;
             case 8:
+                deleteID();
+
                 break;
             // 로그아웃
             case 9:
@@ -147,8 +150,8 @@ public class App {
 
     private void viewDetailedDay() {
         System.out.println("조회하고 싶은 월수와 일수를 입력해주세요");
-        month = stringcheck.numberCheck(sc.next());
-        day = stringcheck.numberCheck(sc.next());
+        month = stringcheck.numberCheck(sc);
+        day = stringcheck.numberCheck(sc);
 
         DayAccountBook dayAccountBook = (visitUserNickname.isEmpty()) ?
                 accountBookController.getDayAccountBook(day, userNickName) :
@@ -157,7 +160,7 @@ public class App {
         accountBookPage.DayAccountBookPage(dayAccountBook, month, day);
 
         System.out.println("1. 내역 추가 / 2. 내역 수정 / 3. 내역 삭제 / 4. 댓글달기 / 9. 뒤로가기");
-        int accountBookNumber = stringcheck.numberCheck(sc.next());
+        int accountBookNumber = stringcheck.numberCheck(sc);
 
         switch (accountBookNumber) {
             case 1:
@@ -187,15 +190,20 @@ public class App {
         System.out.println("카테고리");
         accountBookPage.categoryView(benefitCheck);
         String input = sc.next().toUpperCase();
-
-        AccountCategory accountCategory = (benefitCheck) ?
-                IncomeCategory.valueOf(input) :
-                ExpenseCategory.valueOf(input);
+        AccountCategory accountCategory = null;
+        try {
+            accountCategory = (benefitCheck) ?
+                    IncomeCategory.valueOf(input) :
+                    ExpenseCategory.valueOf(input);
+        } catch (IllegalArgumentException e) {
+            System.out.println("화면에 표시된 값만 입력 가능합니다. 다시 입력해주세요");
+            return;
+        }
 
         System.out.println("아래의 값을 순서대로 입력해주세요");
         System.out.println("1. 가격");
         System.out.println("2. 메모내용");
-        long money = sc.nextLong();
+        long money = stringcheck.longCheck(sc);
         String memo = sc.next();
 
         accountBookController.createDayAccountBook(
@@ -208,7 +216,7 @@ public class App {
         if (!isUserAuthorized()) return;
 
         System.out.println("몇번째 값을 수정하시겠습니까?");
-        int transactionNumber = stringcheck.numberCheck(sc.next());
+        int transactionNumber = stringcheck.numberCheck(sc);
         System.out.println("수익이면 0, 지출이면 1");
         boolean benefitCheck = (sc.next().equals("0"));
 
@@ -231,7 +239,7 @@ public class App {
     private void deleteTransaction() {
         if (!isUserAuthorized()) return;
         System.out.println("몇번째 값을 삭제하시겠습니까?");
-        accountBookController.deleteDayAccountBook(stringCheck.numberCheck(sc.next()), day);
+        accountBookController.deleteDayAccountBook(stringCheck.numberCheck(sc), day);
 
     }
 
@@ -248,7 +256,7 @@ public class App {
         }
     }
 
-    //                        // 현재 로그인한 사용자 정보 조회
+    //현재 로그인한 사용자 정보 조회
     private void checkUser() {
         User currentUser = userController.getCurrentUser();
         if (currentUser != null) {
@@ -301,6 +309,8 @@ public class App {
             String password = sc.next();
 
             userController.deleteUser(new DeleteUserDTO(userEmail, password));
+            userNickName = "";
+            visitUserNickname = "";
         } else {
             System.out.println("회원탈퇴가 취소되었습니다.");
         }

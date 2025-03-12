@@ -22,8 +22,8 @@ public class AccountBookService implements Serializable {
                                   int day) {
 
         Map<Integer, DayAccountBook> monthAccountBook = (visitUserNickname.isEmpty()) ?
-            getToFile(month, userNickName) :
-            getToFile(month, visitUserNickname);
+            getToFile(userNickName) :
+            getToFile(visitUserNickname);
 
         TransactionAccountBook transactionAccountBook = new TransactionAccountBook(
                 transactionAccountBookDTO.isBenefit(),
@@ -40,10 +40,10 @@ public class AccountBookService implements Serializable {
 
         monthAccountBook.put(day, dayAccountBook);
 
-        saveToFile(monthAccountBook, month, userNickName);
+        saveToFile(monthAccountBook);
     }
 
-    private void saveToFile (Map<Integer, DayAccountBook> monthAccountBook, int month, String userNickName) {
+    private void saveToFile (Map<Integer, DayAccountBook> monthAccountBook) {
         // 저장할 경로 설정
         String directoryPath = USER_DATA_FOLDER + File.separator + userNickName + File.separator + "calendar";
         File directory = new File(directoryPath);
@@ -64,7 +64,7 @@ public class AccountBookService implements Serializable {
     }
 
     // 지정된 위치의 거래내역 가져오기
-    public  Map<Integer, DayAccountBook> getToFile(int month, String userNickName) {
+    public  Map<Integer, DayAccountBook> getToFile(String userNickName) {
         File file = new File(USER_DATA_FOLDER + File.separator + userNickName + File.separator + "calendar" + File.separator + month + ".ser");
         Map<Integer, DayAccountBook> monthAccountBook = new HashMap<>();
 
@@ -85,14 +85,14 @@ public class AccountBookService implements Serializable {
 
 
     public DayAccountBook getDayAccountBook(int day, String userNickName) {
-        Map<Integer, DayAccountBook> monthAccountBook = getToFile(month, userNickName);
+        Map<Integer, DayAccountBook> monthAccountBook = getToFile(userNickName);
 
         return (monthAccountBook.containsKey(day)) ? monthAccountBook.get(day) : new DayAccountBook();
 
     }
     public GetMonthDataVO getMonthMoney(String userNickName){
 
-        Map<Integer, DayAccountBook> monthAccountBook = getToFile(month, userNickName); // 월별 거래내역
+        Map<Integer, DayAccountBook> monthAccountBook = getToFile(userNickName); // 월별 거래내역
         Map<Integer, DayMoney> daysMoney = new HashMap<>();             // key : 일수, DayMoney : 일일 총 수익 및 지출 
         Map<AccountCategory, Long> categoryMoneyCheck = new HashMap<>();     // 가장
 
@@ -117,30 +117,36 @@ public class AccountBookService implements Serializable {
                 }
             }
             monthTotalMoney = income - expense;
-            Entry<AccountCategory, Long> maxEntry = Collections.max(categoryMoneyCheck.entrySet(), Entry.comparingByValue());
-            category = maxEntry.getKey();
-            maxCategoryMoney = maxEntry.getValue();
+
+            if (!categoryMoneyCheck.isEmpty()) {
+                Entry<AccountCategory, Long> maxEntry = Collections.max(categoryMoneyCheck.entrySet(), Entry.comparingByValue());
+                category = maxEntry.getKey();
+                maxCategoryMoney = maxEntry.getValue();
+            }
+
             daysMoney.put(dayMoney.getKey(), new DayMoney(income, expense));
         }
 
         return new GetMonthDataVO(daysMoney, category, maxCategoryMoney, monthTotalMoney);
     }
 
-    public void updateDayAccountBook(UpdateTransactionAccountBookDTO dto, int transactionNumber, int day){
-        Map<Integer, DayAccountBook> monthAccountBook = getToFile(month, userNickName);
-        DayAccountBook dayAccountBook= monthAccountBook.get(day);
-        TransactionAccountBook transactionAccountBook = dayAccountBook.getTransactionAccountBooks().get(transactionNumber-1);
-        transactionAccountBook.UpdateTransactionAccountBook(dto.isBenefit(), dto.getMoney(), dto.getAccountCategory());
-
-        saveToFile(monthAccountBook, month, userNickName);
+    public void updateDayAccountBook(UpdateTransactionAccountBookDTO dto, int transactionNumber, int day) {
+        Map<Integer, DayAccountBook> monthAccountBook = getToFile(userNickName);
+        Optional.ofNullable(monthAccountBook.get(day))
+                .map(DayAccountBook::getTransactionAccountBooks)
+                .filter(list -> transactionNumber - 1 < list.size())
+                .ifPresent(list -> list.get(transactionNumber - 1)
+                        .UpdateTransactionAccountBook(dto.isBenefit(), dto.getMoney(), dto.getAccountCategory()));
+        saveToFile(monthAccountBook);
     }
 
-    public void deleteDayAccountBook(int transactionNumber, int day){
-        Map<Integer, DayAccountBook> monthAccountBook = getToFile(month, userNickName);
-        DayAccountBook dayAccountBook = monthAccountBook.get(day);
-        TransactionAccountBook transactionAccountBook = dayAccountBook.getTransactionAccountBooks().remove(transactionNumber-1);
-
-        saveToFile(monthAccountBook, month, userNickName);
+    public void deleteDayAccountBook(int transactionNumber, int day) {
+        Map<Integer, DayAccountBook> monthAccountBook = getToFile(userNickName);
+        Optional.ofNullable(monthAccountBook.get(day))
+                .map(DayAccountBook::getTransactionAccountBooks)
+                .filter(list -> transactionNumber - 1 < list.size())
+                .ifPresent(list -> list.remove(transactionNumber - 1));
+        saveToFile(monthAccountBook);
     }
 }
 
