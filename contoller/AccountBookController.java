@@ -2,11 +2,11 @@ package contoller;
 
 import DTO.CreateAccountBookDTO;
 import DTO.CreateTransactionAccountBookDTO;
+import DTO.UpdateTransactionAccountBookDTO;
+import DTO.VO.GetMonthDataVO;
 import lombok.RequiredArgsConstructor;
 import model.DayAccountBook;
-import model.DayMoney;
 import service.AccountBookService;
-import java.util.Map;
 
 @RequiredArgsConstructor
 public class AccountBookController {
@@ -16,18 +16,29 @@ public class AccountBookController {
     // 상세 가계부 추가
     public void createDayAccountBook(CreateAccountBookDTO AccountBookDTO,
                                      CreateTransactionAccountBookDTO transactionAccountBookDTO,
-                                     int month, int day, String userNickName){
-    accountBookService.createAccountBook(AccountBookDTO, transactionAccountBookDTO, month, day, userNickName);
-
+                                     int day){
+    accountBookService.createAccountBook(AccountBookDTO, transactionAccountBookDTO, day);
     }
 
-    // 특정 날짜의 가계부 가져오기
-    public DayAccountBook getDayAccountBook(int month, int day, String userNickName){
-        return accountBookService.getDayAccountBook(month, day, userNickName);
-    }
-
-    public Map<Integer, DayMoney> getMonthMoney(String userNickName){
+    // 월별 가계부 가져오기
+    public GetMonthDataVO getMonthMoney(String userNickName){
         return accountBookService.getMonthMoney(userNickName);
+    }
+
+    // 특정 날짜의 상세 가계부 가져오기
+    public DayAccountBook getDayAccountBook(int day, String userNickName){
+        return accountBookService.getDayAccountBook(day, userNickName);
+    }
+
+    // 상세 가계부 내역 수정
+    public void updateDayAccountBook(UpdateTransactionAccountBookDTO dto, int transactionNumber, int day){
+        accountBookService.updateDayAccountBook(dto, transactionNumber, day);
+    }
+
+    // 상세 가계부 내역 삭제
+    public void deleteDayAccountBook(int transactionNumber, int day){
+        accountBookService.deleteDayAccountBook(transactionNumber, day);
+
     }
 }
 
