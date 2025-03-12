@@ -1,6 +1,7 @@
 package repository;
 
 import model.User;
+import util.FilePathConstants;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -8,12 +9,12 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * 사용자 데이터 관리 저장소
- * 파일 기반 사용자 정보 저장 및 조회 담당
+ * 사용자 데이터 저장소 클래스
+ * 파일 기반으로 사용자 정보를 관리
  */
 public class UserRepository {
 	// 사용자 데이터 파일 경로
-	private static final String USER_DATA_FILE = "data/users.ser";
+	private static final String USER_DATA_FILE = FilePathConstants.USER_DATA_FILE;
 	
 	// 메모리에 로드된 사용자 목록
 	private List<User> users;
@@ -68,6 +69,9 @@ public class UserRepository {
 
 	/**
 	 * 이메일로 사용자 찾기
+	 * 
+	 * @param email 검색할 이메일
+	 * @return 사용자 객체 (Optional)
 	 */
 	public Optional<User> findByEmail(String email) {
 		return users.stream()
@@ -77,7 +81,9 @@ public class UserRepository {
 
 	/**
 	 * 새 사용자 저장
-	 * 이메일 중복 체크 후 추가
+	 * 
+	 * @param user 저장할 사용자 객체
+	 * @return 저장 성공 여부
 	 */
 	public boolean save(User user) {
 		// 이메일 중복 체크
@@ -91,7 +97,9 @@ public class UserRepository {
 
 	/**
 	 * 사용자 정보 업데이트
-	 * 이메일로 사용자 찾아 정보 갱신
+	 * 
+	 * @param user 업데이트할 사용자 객체
+	 * @return 업데이트 성공 여부
 	 */
 	public boolean update(User user) {
 		// 이메일로 사용자 찾기
@@ -110,7 +118,9 @@ public class UserRepository {
 
 	/**
 	 * 사용자 삭제
-	 * 이메일로 사용자 찾아 제거
+	 * 
+	 * @param email 삭제할 사용자 이메일
+	 * @return 삭제 성공 여부
 	 */
 	public boolean delete(String email) {
 		Optional<User> userOpt = findByEmail(email);
@@ -126,6 +136,8 @@ public class UserRepository {
 
 	/**
 	 * 모든 사용자 조회
+	 * 
+	 * @return 사용자 목록
 	 */
 	public List<User> findAll() {
 		return new ArrayList<>(users); // 원본 리스트 보호를 위한 복사본 반환
@@ -133,6 +145,8 @@ public class UserRepository {
 
 	/**
 	 * 활성 상태인 사용자만 조회
+	 * 
+	 * @return 활성 사용자 목록
 	 */
 	public List<User> findAllActive() {
 		return users.stream()

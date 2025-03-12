@@ -10,8 +10,7 @@ import service.UserService;
 import util.FileUtil;
 
 /**
- * 사용자 관련 요청 처리 컨트롤러
- * 사용자 인터페이스와 서비스 계층 연결 및 세션 관리
+ * 사용자 관련 요청을 처리하는 컨트롤러 클래스
  */
 public class UserController {
 	// 사용자 관련 비즈니스 로직 서비스
@@ -23,6 +22,9 @@ public class UserController {
 	// 로그인 상태
 	private boolean isLoggedIn = false;
 	
+	// 현재 로그인한 사용자 이메일
+	private String currentUserEmail = null;
+	
 	/**
 	 * 생성자 - UserService 초기화
 	 */
@@ -32,7 +34,9 @@ public class UserController {
 	
 	/**
 	 * 회원가입 처리
-	 * 사용자 정보 검증 및 계정 생성
+	 * 
+	 * @param dto 회원가입 정보
+	 * @return 가입 성공 여부
 	 */
 	public boolean createUser(CreateUserDTO dto) {
 		try {
@@ -41,15 +45,8 @@ public class UserController {
 				System.out.println("회원가입이 성공적으로 완료되었습니다.");
 				System.out.println("사용자 폴더가 생성되었습니다: data/" + dto.getNickname());
 				
-				// App 클래스의 정적 변수도 업데이트 (기존 코드와의 호환성 유지)
-				if (App.class != null) {
-					try {
-						App.loginCheck = false;
-						App.userEmail = "";
-					} catch (Exception e) {
-						// App 클래스가 없거나 접근할 수 없는 경우 무시
-					}
-				}
+				// 세션 초기화
+				resetSession();
 			} else
 				System.out.println("회원가입에 실패했습니다.");
 			
@@ -62,13 +59,16 @@ public class UserController {
 	
 	/**
 	 * 로그인 처리
-	 * 인증 후 세션 정보 업데이트
+	 * 
+	 * @param dto 로그인 정보
+	 * @return 로그인 성공 여부
 	 */
 	public boolean login(LoginUserDTO dto) {
 		boolean result = userService.login(dto);
 		if (result) {
 			// 로그인 성공 시 컨트롤러 내부 상태 업데이트
 			this.isLoggedIn = true;
+			this.currentUserEmail = dto.getEmail();
 
 			// 사용자 정보를 조회하여 닉네임 설정
 			User user = userService.getUserByEmail(dto.getEmail());
@@ -78,27 +78,11 @@ public class UserController {
 			
 			System.out.println("로그인에 성공했습니다.");
 			
-			// App 클래스의 정적 변수도 업데이트 (기존 코드와의 호환성 유지)
-			if (App.class != null) {
-				try {
-					App.loginCheck = true;
-					App.userEmail = dto.getEmail();
-				} catch (Exception e) {
-					// App 클래스가 없거나 접근할 수 없는 경우 무시
-				}
-			}
+			// App 클래스 정적 변수 업데이트 (호환성 유지)
+			updateAppSession(true, dto.getEmail());
 		} else {
 			System.out.println("로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.");
-			
-			// App 클래스의 정적 변수도 업데이트 (기존 코드와의 호환성 유지)
-			if (App.class != null) {
-				try {
-					App.loginCheck = false;
-					App.userEmail = "";
-				} catch (Exception e) {
-					// App 클래스가 없거나 접근할 수 없는 경우 무시
-				}
-			}
+			resetSession();
 		}
 		
 		return result;
@@ -106,29 +90,22 @@ public class UserController {
 	
 	/**
 	 * 로그아웃 처리
-	 * 세션 정보 초기화
 	 */
 	public void logout() {
 		// 로그아웃 처리
-		this.isLoggedIn = false;
-		this.currentUserNickName = null;
+		resetSession();
 		
 		System.out.println("로그아웃 되었습니다.");
 		
-		// App 클래스의 정적 변수도 업데이트 (기존 코드와의 호환성 유지)
-		if (App.class != null) {
-			try {
-				App.loginCheck = false;
-				App.userEmail = "";
-			} catch (Exception e) {
-				// App 클래스가 없거나 접근할 수 없는 경우 무시
-			}
-		}
+		// App 클래스 정적 변수 업데이트 (호환성 유지)
+		updateAppSession(false, "");
 	}
 	
 	/**
 	 * 회원정보 수정
-	 * 현재 비밀번호 확인 후 정보 업데이트
+	 * 
+	 * @param dto 수정할 정보
+	 * @return 수정 성공 여부
 	 */
 	public boolean updateUser(UpdateUserDTO dto) {
 		try {
@@ -150,13 +127,12 @@ public class UserController {
 			if (result) {
 				System.out.println("회원정보가 성공적으로 수정되었습니다.");
 				
-				// 이메일이 변경된 경우 App 클래스의 정적 변수도 업데이트
-				if (dto.getNewEmail() != null && !dto.getNewEmail().isEmpty() && App.class != null) {
-					try {
-						App.userEmail = dto.getNewEmail();
-					} catch (Exception e) {
-						// App 클래스가 없거나 접근할 수 없는 경우 무시
-					}
+				// 이메일이 변경된 경우 세션 정보 업데이트
+				if (dto.getNewEmail() != null && !dto.getNewEmail().isEmpty()) {
+					this.currentUserEmail = dto.getNewEmail();
+					
+					// App 클래스 정적 변수 업데이트 (호환성 유지)
+					updateAppSession(true, dto.getNewEmail());
 				}
 			} else {
 				System.out.println("회원정보 수정에 실패했습니다.");
@@ -170,8 +146,10 @@ public class UserController {
 	}
 	
 	/**
-	 * 회원 탈퇴
-	 * 비밀번호 확인 후 계정 비활성화
+	 * 회원 탈퇴 처리
+	 * 
+	 * @param dto 탈퇴 정보
+	 * @return 탈퇴 성공 여부
 	 */
 	public boolean deleteUser(DeleteUserDTO dto) {
 		// 로그인 상태 확인
@@ -201,6 +179,8 @@ public class UserController {
 	
 	/**
 	 * 현재 로그인한 사용자 정보 조회
+	 * 
+	 * @return 현재 사용자 객체 (없으면 null)
 	 */
 	public User getCurrentUser() {
 		if (!isLoggedIn || currentUserNickName == null)
@@ -211,6 +191,8 @@ public class UserController {
 	
 	/**
 	 * 로그인 상태 확인
+	 * 
+	 * @return 로그인 여부
 	 */
 	public boolean isLoggedIn() {
 		return isLoggedIn;
@@ -218,13 +200,26 @@ public class UserController {
 	
 	/**
 	 * 현재 로그인한 사용자 닉네임 조회
+	 * 
+	 * @return 현재 사용자 닉네임
 	 */
 	public String getCurrentUserNickName() {
 		return currentUserNickName;
 	}
 	
 	/**
+	 * 현재 로그인한 사용자 이메일 조회
+	 * 
+	 * @return 현재 사용자 이메일
+	 */
+	public String getCurrentUserEmail() {
+		return currentUserEmail;
+	}
+	
+	/**
 	 * 현재 사용자의 데이터 디렉토리 경로 조회
+	 * 
+	 * @return 데이터 디렉토리 경로
 	 */
 	public String getCurrentUserDirectoryPath() {
 		if (!isLoggedIn || currentUserNickName == null)
@@ -233,8 +228,38 @@ public class UserController {
 		return "data/" + currentUserNickName;
 	}
 
+	/**
+	 * 닉네임 존재 여부 확인
+	 * 
+	 * @param visitUserNickName 확인할 닉네임
+	 * @return 존재 여부
+	 */
 	public boolean checkNicknameExists(String visitUserNickName) {
 		return userService.checkNicknameExists(visitUserNickName);
 	}
-
+	
+	/**
+	 * 세션 정보 초기화
+	 */
+	private void resetSession() {
+		this.isLoggedIn = false;
+		this.currentUserNickName = null;
+		this.currentUserEmail = null;
+	}
+	
+	/**
+	 * App 클래스 정적 변수 업데이트 (호환성 유지)
+	 * 
+	 * @param loginStatus 로그인 상태
+	 * @param email 사용자 이메일
+	 */
+	private void updateAppSession(boolean loginStatus, String email) {
+		try {
+			// 리플렉션을 사용하지 않고 직접 접근 (호환성 유지)
+			App.loginCheck = loginStatus;
+			App.userEmail = email;
+		} catch (Exception e) {
+			// App 클래스가 없거나 접근할 수 없는 경우 무시
+		}
+	}
 }

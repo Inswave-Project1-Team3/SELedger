@@ -1,27 +1,29 @@
 package service;
 
-import static app.App.*;
+// App 클래스 의존성 제거
+// import static app.App.*;
 import DTO.CreateUserDTO;
 import DTO.DeleteUserDTO;
 import DTO.LoginUserDTO;
 import DTO.UpdateUserDTO;
 import model.User;
 import repository.UserRepository;
+import util.FilePathConstants;
 import util.InputValidator;
+import util.UserCheck;
 
 import java.io.File;
 import java.util.Optional;
 
 /**
- * 사용자 관련 비즈니스 로직 처리
- * 회원가입, 로그인, 정보 수정, 탈퇴 등 사용자 관련 기능 담당
+ * 사용자 관련 비즈니스 로직을 처리하는 서비스 클래스
  */
 public class UserService {
 	// 사용자 데이터 접근용 리포지토리
 	private final UserRepository userRepository;
 
 	// 사용자 데이터 저장 폴더
-	private static final String USER_DATA_FOLDER = "data";
+	private static final String USER_DATA_FOLDER = FilePathConstants.DATA_DIRECTORY;
 
 	/**
 	 * 생성자 - UserRepository 초기화
@@ -32,27 +34,14 @@ public class UserService {
 
 	/**
 	 * 회원가입 처리
-	 * 입력값 검증 후 사용자 생성 및 개인 폴더 생성
-	 *
+	 * 
 	 * @param dto 회원가입 정보
-	 * @return 성공 여부
-	 * @throws IllegalArgumentException 유효성 검증 실패 또는 중복 이메일/닉네임
+	 * @return 가입 성공 여부
+	 * @throws IllegalArgumentException 유효성 검증 실패 시
 	 */
 	public boolean createUser(CreateUserDTO dto) throws IllegalArgumentException {
 		// 입력값 검증
-		String validationResult = InputValidator.validateUserInput(
-				dto.getEmail(), dto.getPassword(), dto.getNickname());
-
-		if (validationResult != null)
-			throw new IllegalArgumentException(validationResult);
-
-		// 이메일 중복 체크
-		if (userRepository.findByEmail(dto.getEmail()).isPresent())
-			throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
-
-		// 닉네임 중복 체크
-		if (isNicknameExists(dto.getNickname()))
-			throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
+		validateCreateUserInput(dto);
 
 		// 사용자 객체 생성 및 저장
 		User user = new User();
@@ -73,7 +62,33 @@ public class UserService {
 	}
 
 	/**
+	 * 회원가입 입력값 검증
+	 * 
+	 * @param dto 검증할 회원가입 정보
+	 * @throws IllegalArgumentException 유효성 검증 실패 시
+	 */
+	private void validateCreateUserInput(CreateUserDTO dto) throws IllegalArgumentException {
+		// 입력값 검증
+		String validationResult = InputValidator.validateUserInput(
+				dto.getEmail(), dto.getPassword(), dto.getNickname());
+
+		if (validationResult != null)
+			throw new IllegalArgumentException(validationResult);
+
+		// 이메일 중복 체크
+		if (UserCheck.isEmailExists(dto.getEmail(), userRepository))
+			throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+
+		// 닉네임 중복 체크
+		if (isNicknameExists(dto.getNickname()))
+			throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
+	}
+
+	/**
 	 * 닉네임 중복 확인
+	 * 
+	 * @param nickname 확인할 닉네임
+	 * @return 중복 여부
 	 */
 	private boolean isNicknameExists(String nickname) {
 		return userRepository.findAll().stream()
@@ -82,6 +97,9 @@ public class UserService {
 
 	/**
 	 * 사용자 개인 폴더 생성
+	 * 
+	 * @param nickname 사용자 닉네임
+	 * @return 생성 성공 여부
 	 */
 	private boolean createUserFolder(String nickname) {
 		try {
@@ -117,7 +135,9 @@ public class UserService {
 
 	/**
 	 * 로그인 처리
-	 * 이메일과 비밀번호 검증 (탈퇴 회원 체크)
+	 * 
+	 * @param dto 로그인 정보
+	 * @return 로그인 성공 여부
 	 */
 	public boolean login(LoginUserDTO dto) {
 		// 이메일 형식 검증
@@ -146,36 +166,14 @@ public class UserService {
 	
 	/**
 	 * 회원정보 수정
-	 * 현재 비밀번호 확인 후 이메일/비밀번호 업데이트
-	 * (닉네임은 변경 불가)
+	 * 
+	 * @param dto 수정할 정보
+	 * @return 수정 성공 여부
+	 * @throws IllegalArgumentException 유효성 검증 실패 시
 	 */
 	public boolean updateUser(UpdateUserDTO dto) throws IllegalArgumentException {
-		// 이메일 형식 검증
-		if (!InputValidator.isValidEmail(dto.getEmail()))
-			throw new IllegalArgumentException("이메일 형식이 올바르지 않습니다.");
-
-		// 새 이메일이 있는 경우 검증
-		if (dto.getNewEmail() != null && !dto.getNewEmail().isEmpty()) {
-			if (!InputValidator.isValidEmail(dto.getNewEmail()))
-				throw new IllegalArgumentException("새 이메일 형식이 올바르지 않습니다.");
-
-			// 새 이메일 중복 체크
-			if (!dto.getEmail().equals(dto.getNewEmail()) && userRepository.findByEmail(dto.getNewEmail()).isPresent())
-				throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
-		}
-		
-		// 새 비밀번호가 있는 경우 검증
-		if (dto.getNewPassword() != null && !dto.getNewPassword().isEmpty()) {
-			if (!InputValidator.isValidPassword(dto.getNewPassword()))
-				throw new IllegalArgumentException("새 비밀번호는 8자리 이상이며, 최소 하나 이상의 특수문자를 포함해야 합니다.");
-		}
-
-		// 닉네임 변경 요청이 있는 경우 경고 메시지 출력 후 무시
-		if (dto.getNickname() != null && !dto.getNickname().isEmpty()) {
-			System.out.println("닉네임은 변경할 수 없습니다. 닉네임 변경 요청이 무시됩니다.");
-			// 닉네임 변경 요청 무시 (null로 설정)
-			dto = new UpdateUserDTO(dto.getEmail(), dto.getCurrentPassword(), dto.getNewEmail(), dto.getNewPassword(), null);
-		}
+		// 입력값 검증
+		validateUpdateUserInput(dto);
 
 		// 이메일로 사용자 조회
 		Optional<User> userOpt = userRepository.findByEmail(dto.getEmail());
@@ -200,8 +198,43 @@ public class UserService {
 	}
 	
 	/**
-	 * 회원 탈퇴
-	 * 비밀번호 확인 후 탈퇴 처리 (실제 삭제 아님)
+	 * 회원정보 수정 입력값 검증
+	 * 
+	 * @param dto 검증할 수정 정보
+	 * @throws IllegalArgumentException 유효성 검증 실패 시
+	 */
+	private void validateUpdateUserInput(UpdateUserDTO dto) throws IllegalArgumentException {
+		// 이메일 형식 검증
+		if (!InputValidator.isValidEmail(dto.getEmail()))
+			throw new IllegalArgumentException("이메일 형식이 올바르지 않습니다.");
+
+		// 새 이메일이 있는 경우 검증
+		if (dto.getNewEmail() != null && !dto.getNewEmail().isEmpty()) {
+			if (!InputValidator.isValidEmail(dto.getNewEmail()))
+				throw new IllegalArgumentException("새 이메일 형식이 올바르지 않습니다.");
+
+			// 새 이메일 중복 체크
+			if (!dto.getEmail().equals(dto.getNewEmail()) && UserCheck.isEmailExists(dto.getNewEmail(), userRepository))
+				throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+		}
+		
+		// 새 비밀번호가 있는 경우 검증
+		if (dto.getNewPassword() != null && !dto.getNewPassword().isEmpty()) {
+			if (!InputValidator.isValidPassword(dto.getNewPassword()))
+				throw new IllegalArgumentException("새 비밀번호는 8자리 이상이며, 최소 하나 이상의 특수문자를 포함해야 합니다.");
+		}
+
+		// 닉네임 변경 요청이 있는 경우 경고 메시지 출력 후 무시
+		if (dto.getNickname() != null && !dto.getNickname().isEmpty()) {
+			System.out.println("닉네임은 변경할 수 없습니다. 닉네임 변경 요청이 무시됩니다.");
+		}
+	}
+	
+	/**
+	 * 회원 탈퇴 처리
+	 * 
+	 * @param dto 탈퇴 정보
+	 * @return 탈퇴 성공 여부
 	 */
 	public boolean deleteUser(DeleteUserDTO dto) {
 		// 이메일 형식 검증
@@ -226,6 +259,9 @@ public class UserService {
 	
 	/**
 	 * 이메일로 사용자 조회
+	 * 
+	 * @param email 조회할 이메일
+	 * @return 사용자 객체 (없으면 null)
 	 */
 	public User getUserByEmail(String email) {
 		if (email == null || email.isEmpty())
@@ -237,6 +273,9 @@ public class UserService {
 	
 	/**
 	 * 닉네임으로 사용자 조회
+	 * 
+	 * @param nickname 조회할 닉네임
+	 * @return 사용자 객체 (없으면 null)
 	 */
 	public User getUserByNickName(String nickname) {
 		if (nickname == null || nickname.isEmpty())
@@ -247,10 +286,14 @@ public class UserService {
 				.findFirst()
 				.orElse(null);
 	}
-
+	
+	/**
+	 * 닉네임 존재 여부 확인
+	 * 
+	 * @param nickname 확인할 닉네임
+	 * @return 존재 여부
+	 */
 	public boolean checkNicknameExists(String nickname) {
-		return userRepository.findAll().stream()
-				.anyMatch(user -> user.getNickName().equals(nickname) && !user.getNickName().equals(userNickName));
+		return isNicknameExists(nickname);
 	}
-
 }
