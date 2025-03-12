@@ -2,16 +2,12 @@ package app;
 
 import java.time.LocalDateTime;
 import java.util.Scanner;
-import DTO.CreateUserDTO;
-import DTO.DeleteUserDTO;
-import DTO.LoginUserDTO;
-import DTO.UpdateUserDTO;
+
+import DTO.*;
 import DTO.VO.GetMonthDataVO;
 import contoller.AccountBookController;
 import contoller.UserController;
 import model.*;
-import DTO.CreateTransactionAccountBookDTO;
-import DTO.CreateAccountBookDTO;
 import util.InputValidator;
 import util.StringCheck;
 import view.MainPage;
@@ -26,7 +22,7 @@ public class App {
 
     //현재 로그인한 사용자의 이메일
     public static String userEmail = "";
-    
+
     //현재 로그인한 사용자의 닉네임
     public static String userNickName = "";
 
@@ -106,20 +102,20 @@ public class App {
                         System.out.println("조회하고 싶은 월수와 일수를 입력해주세요");
                         month = stringcheck.numberCheck(sc.next());
                         int day = stringcheck.numberCheck(sc.next());
-                        
+
                         // visitUserNickname 가 값이 없다면 자신의 주소 출력
                         DayAccountBook dayAccountBook = (visitUserNickname.isEmpty()) ?
                                 accountBookController.getDayAccountBook(day, userNickName) :
                                 accountBookController.getDayAccountBook(day, visitUserNickname);
-                        
+
                         accountBookPage.DayAccountBookPage(dayAccountBook, month, day);
 
-                        System.out.println("1. 내역 추가, 2. 댓글달기, 9. 뒤로가기");
+                        System.out.println("1. 내역 추가 / 2. 내역 수정 / 3. 내역 삭제 / 4. 댓글달기 / 9. 뒤로가기");
                         int accountBookNumber = stringcheck.numberCheck(sc.next());
 
                         switch (accountBookNumber) {
                             case 1:
-                                if(!visitUserNickname.isEmpty()) {
+                                if (!visitUserNickname.isEmpty()) {
                                     System.out.println("자신의 게시글에만 접근할 수 있습니다");
                                     continue;
                                 }
@@ -145,7 +141,40 @@ public class App {
                                         new CreateTransactionAccountBookDTO(benefitCheck, money, accountCategory),
                                         day);
                                 break;
-                            case 2 :
+                            case 2:
+                                if (!visitUserNickname.isEmpty()) {
+                                    System.out.println("자신의 게시글에만 접근할 수 있습니다");
+                                    continue;
+                                }
+
+                                System.out.println("몇번째 값을 수정하시겠습니까?");
+                                int transactionNumber = stringcheck.numberCheck(sc.next());
+                                System.out.println("수익이면 0, 지출이면 1");
+                                benefitCheck = (sc.next().equals("0"));
+
+                                System.out.println("카테고리");
+                                accountBookPage.categoryView(benefitCheck);
+                                input = sc.next().toUpperCase();
+
+                                accountCategory = (benefitCheck) ?
+                                        IncomeCategory.valueOf(input) :
+                                        ExpenseCategory.valueOf(input);
+
+                                System.out.println("가격");
+                                money = sc.nextLong();
+                                accountBookController.updateDayAccountBook(new UpdateTransactionAccountBookDTO(benefitCheck, money, accountCategory), transactionNumber, day);
+                                break;
+                            case 3:
+                                if (!visitUserNickname.isEmpty()) {
+                                    System.out.println("자신의 게시글에만 접근할 수 있습니다");
+
+                                    continue;
+                                }
+                                System.out.println("몇번째 값을 삭제하시겠습니까?");
+                                accountBookController.deleteDayAccountBook(stringCheck.numberCheck(sc.next()), day);
+                                break;
+
+                            case 4:
                                 break;
                             case 9: // 뒤로가기
                                 visitUserNickname = "";
@@ -161,14 +190,14 @@ public class App {
                     case 2:
                         System.out.println("방문할 유저의 nickName 을 입력해주세요. 존재하지 않는 user 라면 방문하지 않습니다");
                         String inputUserName = sc.next();
-                        if(userController.checkNicknameExists(inputUserName)) {
+                        if (userController.checkNicknameExists(inputUserName)) {
                             userNickName = inputUserName;
-                        } else{
-                            System.out.println("존재하지 않는 유저이거나, 본인의 nickname을 입력하셨습니다.");
+                        } else {
+                            System.out.println("존재하지 않는 유저이거나, 본인의 nickname 을 입력하셨습니다. 다시 입력해주세요");
                             System.out.println();
                         }
                         break;
-                        
+
                     // 회원정보 조회
                     case 3:
                         // 현재 로그인한 사용자 정보 조회
@@ -183,13 +212,13 @@ public class App {
                             System.out.println("회원정보를 조회할 수 없습니다.");
                         }
                         break;
-                        
+
                     // 회원정보 수정
                     case 4:
                         System.out.println("\n----- 회원정보 수정 -----");
                         System.out.println("현재 비밀번호를 입력하세요:");
                         String currentPassword = sc.next();
-                        
+
                         System.out.println("새 이메일을 입력하세요 (변경하지 않으려면 'skip' 입력):");
                         String newEmail = sc.next();
                         if (newEmail.equalsIgnoreCase("skip"))
@@ -198,7 +227,7 @@ public class App {
                             System.out.println("이메일 형식이 올바르지 않습니다.");
                             break;
                         }
-                        
+
                         System.out.println("새 비밀번호를 입력하세요 (8자리 이상, 특수문자 포함, 변경하지 않으려면 'skip' 입력):");
                         String newPassword = sc.next();
                         if (newPassword.equalsIgnoreCase("skip"))
@@ -207,11 +236,11 @@ public class App {
                             System.out.println("새 비밀번호는 8자리 이상이며, 최소 하나 이상의 특수문자를 포함해야 합니다.");
                             break;
                         }
-                        
+
                         // 닉네임은 변경할 수 없으므로 null로 설정
                         String newNickname = null;
                         System.out.println("닉네임은 변경할 수 없습니다. 회원가입 시 설정한 닉네임이 유지됩니다.");
-                        
+
                         userController.updateUser(new UpdateUserDTO(userEmail, currentPassword, newEmail, newPassword, newNickname));
                         break;
                     // 뒤로가기
@@ -223,29 +252,29 @@ public class App {
                         System.out.println("\n----- 회원탈퇴 -----");
                         System.out.println("정말 탈퇴하시겠습니까? (Y/N)");
                         String confirm = sc.next();
-                        
+
                         if (confirm.equalsIgnoreCase("Y")) {
                             System.out.println("비밀번호를 입력하세요:");
                             String password = sc.next();
-                            
+
                             userController.deleteUser(new DeleteUserDTO(userEmail, password));
                         } else {
                             System.out.println("회원탈퇴가 취소되었습니다.");
                         }
                         break;
-                        
+
                     // 로그아웃
                     case 9:
                         userController.logout();
                         // 로그아웃 시 닉네임 정보 초기화
                         userNickName = "";
                         break;
-                        
+
                     case 0: // 프로그램 종료
                         System.out.println("프로그램을 종료합니다.");
                         sc.close();
                         return;
-                        
+
                     default:
                         System.out.println("화면에 표시된 값만 입력하실 수 있습니다.");
                 }

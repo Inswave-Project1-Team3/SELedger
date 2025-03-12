@@ -2,6 +2,7 @@ package service;
 
 import DTO.CreateAccountBookDTO;
 import DTO.CreateTransactionAccountBookDTO;
+import DTO.UpdateTransactionAccountBookDTO;
 import DTO.VO.GetMonthDataVO;
 import model.*;
 
@@ -132,6 +133,23 @@ public class AccountBookService implements Serializable {
         }
 
         return new GetMonthDataVO(daysMoney, category, maxCategoryMoney, monthTotalMoney);
+    }
+
+    public void updateDayAccountBook(UpdateTransactionAccountBookDTO dto, int transactionNumber, int day){
+        Map<Integer, DayAccountBook> monthAccountBook = getToFile(month, userNickName);
+        DayAccountBook dayAccountBook= monthAccountBook.get(day);
+        TransactionAccountBook transactionAccountBook = dayAccountBook.getTransactionAccountBooks().get(transactionNumber-1);
+        transactionAccountBook.UpdateTransactionAccountBook(dto.isBenefit(), dto.getMoney(), dto.getAccountCategory());
+
+        saveToFile(monthAccountBook, month, userNickName);
+    }
+
+    public void deleteDayAccountBook(int transactionNumber, int day){
+        Map<Integer, DayAccountBook> monthAccountBook = getToFile(month, userNickName);
+        DayAccountBook dayAccountBook = monthAccountBook.get(day);
+        TransactionAccountBook transactionAccountBook = dayAccountBook.getTransactionAccountBooks().remove(transactionNumber-1);
+
+        saveToFile(monthAccountBook, month, userNickName);
     }
 }
 
