@@ -1,6 +1,4 @@
 package main;
-import java.time.YearMonth;
-import java.util.*;
 
 import app.App;
 
@@ -10,4 +8,3 @@ public class Main {
         app.run();
     }
 }
-
