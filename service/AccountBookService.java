@@ -12,11 +12,16 @@ import java.util.Map.Entry;
 
 import static app.App.*;
 
+/**
+ * 가계부 관련 비즈니스 로직 처리
+ */
 public class AccountBookService implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final String USER_DATA_FOLDER = "data";
 
-    // 선택한 날의 가계부 생성
+    /**
+     * 선택한 날짜에 가계부 항목 생성
+     */
     public void createAccountBook(CreateAccountBookDTO accountBookDTO,
                                   CreateTransactionAccountBookDTO transactionAccountBookDTO,
                                   int day) {
@@ -43,6 +48,9 @@ public class AccountBookService implements Serializable {
         saveToFile(monthAccountBook, month, userNickName);
     }
 
+    /**
+     * 가계부 데이터 파일 저장
+     */
     private void saveToFile (Map<Integer, DayAccountBook> monthAccountBook, int month, String userNickName) {
         // 저장할 경로 설정
         String directoryPath = USER_DATA_FOLDER + File.separator + userNickName + File.separator + "calendar";
@@ -63,7 +71,9 @@ public class AccountBookService implements Serializable {
         }
     }
 
-    // 지정된 위치의 거래내역 가져오기
+    /**
+     * 저장된 가계부 데이터 불러오기
+     */
     public  Map<Integer, DayAccountBook> getToFile(int month, String userNickName) {
         File file = new File(USER_DATA_FOLDER + File.separator + userNickName + File.separator + "calendar" + File.separator + month + ".ser");
         Map<Integer, DayAccountBook> monthAccountBook = new HashMap<>();
@@ -83,13 +93,12 @@ public class AccountBookService implements Serializable {
         return monthAccountBook;
     }
 
-
     public DayAccountBook getDayAccountBook(int day, String userNickName) {
         Map<Integer, DayAccountBook> monthAccountBook = getToFile(month, userNickName);
 
         return (monthAccountBook.containsKey(day)) ? monthAccountBook.get(day) : new DayAccountBook();
-
     }
+  
     public GetMonthDataVO getMonthMoney(String userNickName){
 
         Map<Integer, DayAccountBook> monthAccountBook = getToFile(month, userNickName); // 월별 거래내역
