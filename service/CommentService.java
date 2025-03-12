@@ -14,36 +14,52 @@ import java.util.Scanner;
 
 import model.Comment;
 
+/**
+ * 댓글 관련 비즈니스 로직 처리
+ */
 public class CommentService {
-	//key : 가게부 주인 value : 댓글 이용자의 닉네임과 작성한 댓글
-	Map<String, Map<String, Comment>> countCommentMap = new HashMap<>(); //
+	// 가계부 주인별 댓글 관리 맵 (key: 가계부 주인, value: 댓글 작성자와 댓글 내용)
+	Map<String, Map<String, Comment>> countCommentMap = new HashMap<>();
 	
-	Comment comment = new Comment(); //모델에서 댓글 자료 가져오기
-	Scanner sc = new Scanner(System.in); //임시적으로 스캐너 생성
+	// 댓글 모델 인스턴스
+	Comment comment = new Comment();
 	
-	public void addComment(String countOwner, String commentWriter, String context) { //댓글생성
-		
-		if(!countCommentMap.containsKey(countOwner)) { //댓글을 단 사람이 한 명도 없을 때, 생성해주기
+	// 입력 처리용 스캐너
+	Scanner sc = new Scanner(System.in);
+	
+	/**
+	 * 댓글 추가
+	 */
+	public void addComment(String countOwner, String commentWriter, String context) {
+		// 해당 가계부 주인의 댓글 맵이 없으면 생성
+		if(!countCommentMap.containsKey(countOwner)) {
 			countCommentMap.put(countOwner, new HashMap<String, Comment>());
 		}
+		
+		// 작성자의 댓글이 없으면 새로 추가, 있으면 업데이트
 		if(!countCommentMap.get(countOwner).containsKey(commentWriter)) {
 			countCommentMap.get(countOwner).put(commentWriter, new Comment(commentWriter, context, new Date()));
-		}else {
-			updateComment(countOwner, commentWriter, context); //댓글 생성하기
+		} else {
+			updateComment(countOwner, commentWriter, context);
 		}
-		
 	}
 	
-	public Map<String, Comment> getAllComment(String countOwner) { //댓글 보기
-		
-		if(!countCommentMap.containsKey(countOwner)) { //댓글이 없을 때 맵 생성
+	/**
+	 * 특정 가계부의 모든 댓글 조회
+	 */
+	public Map<String, Comment> getAllComment(String countOwner) {
+		// 댓글이 없으면 빈 맵 생성
+		if(!countCommentMap.containsKey(countOwner)) {
 			countCommentMap.put(countOwner, new HashMap<String, Comment>());
 		}
 		
 		return countCommentMap.get(countOwner);
 	}
 	
-	public void updateComment(String countOwner, String commentWriter, String updateComment) { //댓글 수정
+	/**
+	 * 댓글 수정
+	 */
+	public void updateComment(String countOwner, String commentWriter, String updateComment) {
 	    if (countCommentMap.containsKey(countOwner) && countCommentMap.get(countOwner).containsKey(commentWriter)) {
 	        countCommentMap.get(countOwner).get(commentWriter).update(updateComment);
 	    } else {
@@ -51,7 +67,10 @@ public class CommentService {
 	    }
 	}
 	
-	public void removeComment(String countOwner, String commentWriter) { //댓글 삭제
+	/**
+	 * 댓글 삭제
+	 */
+	public void removeComment(String countOwner, String commentWriter) {
 	    if (countCommentMap.containsKey(countOwner) && countCommentMap.get(countOwner).containsKey(commentWriter)) {
 	        countCommentMap.get(countOwner).remove(commentWriter);
 	    } else {
@@ -59,8 +78,10 @@ public class CommentService {
 	    }
 	}
 	
-	
-	public void saveCommentsToFile(String fileName) { //파일에 저장하기
+	/**
+	 * 댓글 데이터 파일 저장
+	 */
+	public void saveCommentsToFile(String fileName) {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName))) {
             out.writeObject(countCommentMap);
             System.out.println("댓글 데이터를 파일에 저장했습니다.");
@@ -70,7 +91,10 @@ public class CommentService {
         }
     }
 
-    public void loadCommentsFromFile(String fileName) { //파일에서 Map 읽어오기
+	/**
+	 * 댓글 데이터 파일 로드
+	 */
+    public void loadCommentsFromFile(String fileName) {
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(fileName))) {
             countCommentMap = (Map<String, Map<String, Comment>>) in.readObject();
             System.out.println("댓글 데이터를 파일에서 불러왔습니다.");
@@ -79,5 +103,4 @@ public class CommentService {
             e.printStackTrace();
         }
     }
-
 }
