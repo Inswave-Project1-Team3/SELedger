@@ -2,10 +2,13 @@ package contoller;
 
 import DTO.CreateAccountBookDTO;
 import DTO.CreateTransactionAccountBookDTO;
+import DTO.UpdateTransactionAccountBookDTO;
 import DTO.VO.GetMonthDataVO;
 import lombok.RequiredArgsConstructor;
 import model.DayAccountBook;
 import service.AccountBookService;
+
+import static app.App.userNickName;
 
 @RequiredArgsConstructor
 public class AccountBookController {
@@ -20,10 +23,6 @@ public class AccountBookController {
 
     }
 
-    // 월별 가계부 가져오기
-    public GetMonthDataVO getMonthMoney(String userNickName){
-        return accountBookService.getMonthMoney(userNickName);
-    }
 
     // 특정 날짜의 상세 가계부 가져오기
     public DayAccountBook getDayAccountBook(int day, String userNickName){
@@ -36,9 +35,9 @@ public class AccountBookController {
     }
 
     // 상세 가계부 내역 삭제
-    public void deleteDayAccountBook(int transactionNumber, int day){
+    public void deleteDayAccountBook(int transactionNumber, int day) {
         accountBookService.deleteDayAccountBook(transactionNumber, day);
-
+    }
 
     public GetMonthDataVO getMonthMoney(String userNickName){
         return accountBookService.getMonthMoney(userNickName);

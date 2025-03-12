@@ -112,24 +112,37 @@ public class AccountBookService implements Serializable {
         long maxCategoryMoney = 0;          //category 에서 사용한 금액
         long monthTotalMoney = 0;           //이번달 총 지출 민 수익내역// 돈을 많이 쓰는 카테고리를 반한하기 위한 map
 
+        // 모든 일자의 데이터를 합산
         for(Entry<Integer, DayAccountBook> dayMoney : monthAccountBook.entrySet()){
+            long dayIncome = 0;
+            long dayExpense = 0;
 
             for(TransactionAccountBook transactionAccountBook : dayMoney.getValue().getTransactionAccountBooks()) {
                 money = transactionAccountBook.getMoney();
                 if(transactionAccountBook.isBenefit()){
+                    dayIncome += money;
                     income += money;
                 }
                 else {
+                    dayExpense += money;
                     expense += money;
                     category = transactionAccountBook.getAccountCategory();
-                    categoryMoneyCheck.put(category, categoryMoneyCheck.getOrDefault(category, 0L)  + money);
+                    categoryMoneyCheck.put(category, categoryMoneyCheck.getOrDefault(category, 0L) + money);
                 }
             }
-            monthTotalMoney = income - expense;
+            
+            // 각 일자별 수입/지출 정보 저장
+            daysMoney.put(dayMoney.getKey(), new DayMoney(dayIncome, dayExpense));
+        }
+        
+        // 월 전체 총액 계산
+        monthTotalMoney = income - expense;
+        
+        // 카테고리별 지출 맵이 비어있지 않은 경우에만 최대값 계산
+        if (!categoryMoneyCheck.isEmpty()) {
             Entry<AccountCategory, Long> maxEntry = Collections.max(categoryMoneyCheck.entrySet(), Entry.comparingByValue());
             category = maxEntry.getKey();
             maxCategoryMoney = maxEntry.getValue();
-            daysMoney.put(dayMoney.getKey(), new DayMoney(income, expense));
         }
 
         return new GetMonthDataVO(daysMoney, category, maxCategoryMoney, monthTotalMoney);
@@ -152,5 +165,6 @@ public class AccountBookService implements Serializable {
         saveToFile(monthAccountBook, month, userNickName);
     }
 }
+
 
 
