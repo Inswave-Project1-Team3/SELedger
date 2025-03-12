@@ -6,6 +6,7 @@ import DTO.CreateUserDTO;
 import DTO.DeleteUserDTO;
 import DTO.LoginUserDTO;
 import DTO.UpdateUserDTO;
+import DTO.VO.GetMonthDataVO;
 import contoller.AccountBookController;
 import contoller.UserController;
 import model.*;
@@ -28,6 +29,9 @@ public class App {
     
     //현재 로그인한 사용자의 닉네임
     public static String userNickName = "";
+
+    //방문할 사용자의 닉네임. 존재하지 않으면 자신의 가계부 호출
+    public static String visitUserNickname = "";
 
     public static int year = LocalDateTime.now().getYear();
     public static int month = LocalDateTime.now().getMonthValue();
@@ -87,9 +91,14 @@ public class App {
                 }
             } else {  // 로그인된 경우
 
-                accountBookPage.accountMainPage(accountBookController.getMonthMoney(userNickName));
+                // 다른 유저의 달력에 방문하는지 확인
+                GetMonthDataVO vo = (visitUserNickname.isEmpty()) ?
+                        accountBookController.getMonthMoney(userNickName) :
+                        accountBookController.getMonthMoney(visitUserNickname);
 
-                mainPage.mainSelect();
+                accountBookPage.accountMainPage(vo);
+
+                System.out.println("1. 상세요일 보기/2. 친구 가계부 보기/3. 회원정보 조회/4. 회원정보 수정 /7. 뒤로가기/8. 회원탈퇴/9. 로그아웃/0. 프로그램 종료");
                 int number = stringcheck.numberCheck(sc.next());
                 switch (number) {
                     // 상세 요일 보기
@@ -97,35 +106,49 @@ public class App {
                         System.out.println("조회하고 싶은 월수와 일수를 입력해주세요");
                         month = stringcheck.numberCheck(sc.next());
                         int day = stringcheck.numberCheck(sc.next());
-
-                        DayAccountBook dayAccountBook = accountBookController.getDayAccountBook(month, day, userNickName);
+                        
+                        // visitUserNickname 가 값이 없다면 자신의 주소 출력
+                        DayAccountBook dayAccountBook = (visitUserNickname.isEmpty()) ?
+                                accountBookController.getDayAccountBook(day, userNickName) :
+                                accountBookController.getDayAccountBook(day, visitUserNickname);
+                        
                         accountBookPage.DayAccountBookPage(dayAccountBook, month, day);
+
+                        System.out.println("1. 내역 추가, 2. 댓글달기, 9. 뒤로가기");
                         int accountBookNumber = stringcheck.numberCheck(sc.next());
+
                         switch (accountBookNumber) {
                             case 1:
+                                if(!visitUserNickname.isEmpty()) {
+                                    System.out.println("자신의 게시글에만 접근할 수 있습니다");
+                                    continue;
+                                }
                                 System.out.println("수익이면 0, 지출이면 1");
                                 boolean benefitCheck = (sc.next().equals("0"));
 
+                                System.out.println("카테고리");
                                 accountBookPage.categoryView(benefitCheck);
-
                                 String input = sc.next().toUpperCase();
 
                                 AccountCategory accountCategory = (benefitCheck) ?
                                         IncomeCategory.valueOf(input) :
                                         ExpenseCategory.valueOf(input);
 
-                                accountBookPage.addAccount();
-
+                                System.out.println("아래의 값을 순서대로 입력해주세요");
+                                System.out.println("1. 가격");
+                                System.out.println("2. 메모내용");
                                 long money = sc.nextLong();
                                 String memo = sc.next();
 
                                 accountBookController.createDayAccountBook(
                                         new CreateAccountBookDTO(memo),
                                         new CreateTransactionAccountBookDTO(benefitCheck, money, accountCategory),
-                                        month, day, userNickName);
+                                        day);
+                                break;
+                            case 2 :
                                 break;
                             case 9: // 뒤로가기
-                                // 아무 작업 없이 상세 요일 보기 메뉴를 빠져나감
+                                visitUserNickname = "";
                                 System.out.println("메인 메뉴로 돌아갑니다.");
                                 break;
                             default:
@@ -136,7 +159,14 @@ public class App {
                     // 친구 가계부 보기
                     // email 값 받아서 찾아가기
                     case 2:
-                        // 기존 코드 유지
+                        System.out.println("방문할 유저의 nickName 을 입력해주세요. 존재하지 않는 user 라면 방문하지 않습니다");
+                        String inputUserName = sc.next();
+                        if(userController.checkNicknameExists(inputUserName)) {
+                            userNickName = inputUserName;
+                        } else{
+                            System.out.println("존재하지 않는 유저이거나, 본인의 nickname을 입력하셨습니다.");
+                            System.out.println();
+                        }
                         break;
                         
                     // 회원정보 조회
@@ -184,7 +214,10 @@ public class App {
                         
                         userController.updateUser(new UpdateUserDTO(userEmail, currentPassword, newEmail, newPassword, newNickname));
                         break;
-                        
+                    // 뒤로가기
+                    case 7:
+                        visitUserNickname = "";
+                        break;
                     // 회원탈퇴
                     case 8:
                         System.out.println("\n----- 회원탈퇴 -----");

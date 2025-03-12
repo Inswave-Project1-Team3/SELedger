@@ -1,8 +1,11 @@
 package view;
 
 
+import DTO.VO.GetMonthDataVO;
 import model.DayAccountBook;
 import model.DayMoney;
+import model.TransactionAccountBook;
+
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Map;
@@ -14,7 +17,8 @@ public class AccountBookPage {
     private static final int CELL_WIDTH = 12;
     private static final int CELL_HEIGHT = 3;
 
-    public void accountMainPage(Map<Integer, DayMoney> dayData) {
+    public void accountMainPage(GetMonthDataVO vo) {
+        Map<Integer, DayMoney> dayData = vo.getDaysMoney();
         YearMonth ym = YearMonth.of(year, month);
         int daysInMonth = ym.lengthOfMonth();
         LocalDate firstDay = LocalDate.of(year, month, 1);
@@ -57,6 +61,8 @@ public class AccountBookPage {
             }
             printWeekRow(weekCells);
         }
+        System.out.println("이번달 " + vo.getAccountCategory() + " 에 " + vo.getMaxCategoryMoney() + "원으로 가장 많은 지출이 발생했습니다");
+        System.out.println("이번달 총 수입 및 지출량 : " + vo.getMonthTotalMoney() + "원");
     }
 
     private static String[] emptyCell() {
@@ -114,7 +120,6 @@ public class AccountBookPage {
 
 
     public void categoryView(boolean benefitCheck) {
-        System.out.println("카테고리");
         if(benefitCheck) {
             System.out.println("SALARY : 월급");
             System.out.println("BONUS : 보너스");
@@ -129,27 +134,28 @@ public class AccountBookPage {
         }
     }
 
-    public void addAccount(){
-        System.out.println("아래의 값을 순서대로 입력해주세요");
-        System.out.println("1. 가격");
-        System.out.println("2. 메모내용");
-    }
-
     public void DayAccountBookPage(DayAccountBook dayAccountBook, int month, int day) {
-        System.out.println("📅 " + month +" 월 "+ day + "일 가계부");
+        System.out.println("📅 " + month + " 월 " + day + " 일 가계부");
+        System.out.println("==========================================");
+
         if (dayAccountBook != null) {
-            for (int i = 0; i < dayAccountBook.getTransactionAccountBooks().size(); i++) {
-                System.out.println(dayAccountBook.getTransactionAccountBooks().get(i).getMoney() +", " +
-                        dayAccountBook.getTransactionAccountBooks().get(i).getCreateDate() + ", " +
-                        dayAccountBook.getTransactionAccountBooks().get(i).isBenefit() + ", " +
-                        dayAccountBook.getTransactionAccountBooks().get(i).getAccountCategory().getDescription());
+            for (TransactionAccountBook transaction : dayAccountBook.getTransactionAccountBooks()) {
+                String title = transaction.getMoney() + "원";
+                String value = transaction.getCreateDate() + ", " +
+                        (transaction.isBenefit() ? "수입" : "지출") + ", " +
+                        transaction.getAccountCategory().getDescription();
+
+                System.out.printf("%-20s | %s%n", title, value);
             }
-            System.out.println("메모내용 : " + dayAccountBook.getMemo());
+
+            System.out.println("------------------------------------------");
+            System.out.println("메모: " + dayAccountBook.getMemo());
         } else {
             System.out.println("내역이 없습니다");
         }
-        System.out.println("1. 내역 추가, 2. 댓글달기, 9. 뒤로가기");
 
+        System.out.println("==========================================");
+        System.out.println();
     }
 
 }

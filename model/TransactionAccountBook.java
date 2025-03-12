@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter;
 @Getter
 public class TransactionAccountBook implements Serializable {
 	private static final long serialVersionUID = 1L; // 직렬화 버전 ID
-	private long dayAccountBookId;
+	private static long dayAccountBookId;
 	private String createDate;
 	private String updateDate;
 	private AccountCategory accountCategory;
