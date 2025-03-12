@@ -1,5 +1,6 @@
 package service;
 
+import static app.App.*;
 import DTO.CreateUserDTO;
 import DTO.DeleteUserDTO;
 import DTO.LoginUserDTO;
@@ -246,4 +247,10 @@ public class UserService {
 				.findFirst()
 				.orElse(null);
 	}
+
+	public boolean checkNicknameExists(String nickname) {
+		return userRepository.findAll().stream()
+				.anyMatch(user -> user.getNickName().equals(nickname) && !user.getNickName().equals(userNickName));
+	}
+
 }

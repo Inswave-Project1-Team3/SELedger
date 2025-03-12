@@ -69,7 +69,7 @@ public class UserController {
 		if (result) {
 			// 로그인 성공 시 컨트롤러 내부 상태 업데이트
 			this.isLoggedIn = true;
-			
+
 			// 사용자 정보를 조회하여 닉네임 설정
 			User user = userService.getUserByEmail(dto.getEmail());
 			if (user != null) {
@@ -232,4 +232,9 @@ public class UserController {
 		
 		return "data/" + currentUserNickName;
 	}
+
+	public boolean checkNicknameExists(String visitUserNickName) {
+		return userService.checkNicknameExists(visitUserNickName);
+	}
+
 }
