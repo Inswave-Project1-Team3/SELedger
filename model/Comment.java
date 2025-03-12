@@ -3,16 +3,34 @@ package model;
 import java.io.Serializable;
 import java.util.Date;
 
-public class Comment implements Serializable { //댓글에 사용되는 데이터 관리
-	public Date commentDate; //댓글 생성 시간
-	public Date updateDate; //댓글 수정 시간
-	public String ownerwriterNickName; //게시글 주인의 닉네임
-	public String writerNickName; //사용자의 닉네임
-	public String context; //댓글 내용
+/**
+ * 댓글 정보 관리 클래스
+ */
+public class Comment implements Serializable {
+	// 댓글 생성 시간
+	public Date commentDate;
 	
+	// 댓글 수정 시간
+	public Date updateDate;
+	
+	// 게시글 주인 닉네임
+	public String ownerwriterNickName;
+	
+	// 댓글 작성자 닉네임
+	public String writerNickName;
+	
+	// 댓글 내용
+	public String context;
+	
+	/**
+	 * 기본 생성자
+	 */
 	public Comment() {
 	}
 
+	/**
+	 * 댓글 생성 생성자
+	 */
 	public Comment(String writerNickName, String context, Date now) {
 		this.writerNickName = writerNickName;
 		this.context = context;
@@ -25,11 +43,11 @@ public class Comment implements Serializable { //댓글에 사용되는 데이�
 				+ ", context=" + context + "]";
 	}
 
-	public void update(String updateComment) { //댓글 수정될 때 사용할 생성자
+	/**
+	 * 댓글 내용 수정
+	 */
+	public void update(String updateComment) {
 		this.context = updateComment;
 		this.updateDate = new Date();
 	}
-	
-	
-	
 }
