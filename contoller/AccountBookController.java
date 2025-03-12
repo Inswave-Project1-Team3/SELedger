@@ -38,10 +38,4 @@ public class AccountBookController {
     public void deleteDayAccountBook(int transactionNumber, int day) {
         accountBookService.deleteDayAccountBook(transactionNumber, day);
     }
-
-    public GetMonthDataVO getMonthMoney(String userNickName){
-        return accountBookService.getMonthMoney(userNickName);
-
-    }
 }
-
