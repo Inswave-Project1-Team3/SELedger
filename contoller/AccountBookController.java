@@ -23,6 +23,10 @@ public class AccountBookController {
 
     }
 
+    // 월별 가계부 가져오기
+    public GetMonthDataVO getMonthMoney(String userNickName){
+        return accountBookService.getMonthMoney(userNickName);
+    }
 
     // 특정 날짜의 상세 가계부 가져오기
     public DayAccountBook getDayAccountBook(int day, String userNickName){
