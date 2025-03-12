@@ -16,7 +16,7 @@ import java.io.File;
 import java.util.Optional;
 
 /**
- * 사용자 관련 비즈니스 로직을 처리하는 서비스 클래스
+ * 사용자 관련 비즈니스 로직 서비스
  */
 public class UserService {
 	// 사용자 데이터 접근용 리포지토리
@@ -26,7 +26,7 @@ public class UserService {
 	private static final String USER_DATA_FOLDER = FilePathConstants.DATA_DIRECTORY;
 
 	/**
-	 * 생성자 - UserRepository 초기화
+	 * 생성자 - 리포지토리 초기화
 	 */
 	public UserService() {
 		this.userRepository = new UserRepository();
@@ -64,7 +64,7 @@ public class UserService {
 	/**
 	 * 회원가입 입력값 검증
 	 * 
-	 * @param dto 검증할 회원가입 정보
+	 * @param dto 검증할 정보
 	 * @throws IllegalArgumentException 유효성 검증 실패 시
 	 */
 	private void validateCreateUserInput(CreateUserDTO dto) throws IllegalArgumentException {
@@ -200,7 +200,7 @@ public class UserService {
 	/**
 	 * 회원정보 수정 입력값 검증
 	 * 
-	 * @param dto 검증할 수정 정보
+	 * @param dto 검증할 정보
 	 * @throws IllegalArgumentException 유효성 검증 실패 시
 	 */
 	private void validateUpdateUserInput(UpdateUserDTO dto) throws IllegalArgumentException {
@@ -248,25 +248,24 @@ public class UserService {
 		
 		User user = userOpt.get();
 		
-		// 비밀번호 확인 후 탈퇴 처리
-		if (user.deleteUser(dto.getPassword())) {
-			// 변경사항 저장
-			return userRepository.update(user);
+		// 회원 탈퇴 처리
+		boolean result = user.deleteUser(dto.getPassword());
+		
+		// 탈퇴 성공 시 변경사항 저장
+		if (result) {
+			userRepository.update(user);
 		}
 		
-		return false;
+		return result;
 	}
 	
 	/**
 	 * 이메일로 사용자 조회
 	 * 
-	 * @param email 조회할 이메일
-	 * @return 사용자 객체 (없으면 null)
+	 * @param email 사용자 이메일
+	 * @return 사용자 객체
 	 */
 	public User getUserByEmail(String email) {
-		if (email == null || email.isEmpty())
-			return null;
-		
 		Optional<User> userOpt = userRepository.findByEmail(email);
 		return userOpt.orElse(null);
 	}
@@ -274,13 +273,10 @@ public class UserService {
 	/**
 	 * 닉네임으로 사용자 조회
 	 * 
-	 * @param nickname 조회할 닉네임
-	 * @return 사용자 객체 (없으면 null)
+	 * @param nickname 사용자 닉네임
+	 * @return 사용자 객체
 	 */
 	public User getUserByNickName(String nickname) {
-		if (nickname == null || nickname.isEmpty())
-			return null;
-		
 		return userRepository.findAll().stream()
 				.filter(user -> user.getNickName().equals(nickname))
 				.findFirst()

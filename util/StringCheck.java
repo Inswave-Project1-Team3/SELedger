@@ -7,11 +7,10 @@ import java.util.Scanner;
  */
 public class StringCheck {
 	/**
-	 * 문자열을 정수로 변환하고 검증합니다.
-	 * 잘못된 입력이 들어오면 올바른 숫자를 입력할 때까지 다시 입력받습니다.
+	 * 문자열을 정수로 변환
 	 * 
 	 * @param input 변환할 문자열
-	 * @return 변환된 정수
+	 * @return 변환된 정수 (실패 시 -1)
 	 */
 	public int numberCheck(String input) {
 		int num;
@@ -25,10 +24,10 @@ public class StringCheck {
 	}
 	
 	/**
-	 * 사용자로부터 올바른 숫자를 입력받을 때까지 반복합니다.
+	 * 올바른 숫자 입력 받기
 	 * 
-	 * @param scanner 입력을 받을 Scanner 객체
-	 * @return 사용자가 입력한 올바른 숫자
+	 * @param scanner 입력 Scanner
+	 * @return 유효한 정수
 	 */
 	public int getValidNumber(Scanner scanner) {
 		int number;

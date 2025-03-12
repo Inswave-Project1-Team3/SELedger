@@ -4,14 +4,14 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * 비밀번호 암호화 기능을 제공하는 유틸리티 클래스
+ * 비밀번호 암호화 기능 제공 클래스
  */
 public class PasswordEncryptor {
     /**
-     * 비밀번호를 SHA-256 알고리즘으로 암호화
+     * SHA-256 알고리즘으로 비밀번호 암호화
      * 
-     * @param password 암호화할 비밀번호
-     * @return 암호화된 비밀번호 (16진수 문자열)
+     * @param password 원본 비밀번호
+     * @return 암호화된 문자열
      */
     public static String encrypt(String password) {
         try {

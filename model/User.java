@@ -8,14 +8,14 @@ import util.PasswordEncryptor;
 import java.io.Serializable;
 
 /**
- * 사용자 권한을 정의하는 열거형
+ * 사용자 권한 정의
  */
 enum Role {
 	ADMIN, USER
 }
 
 /**
- * 사용자 정보와 계정 관련 기능을 담당하는 모델 클래스
+ * 사용자 정보 및 계정 관리 모델
  */
 @Getter
 @Setter
@@ -68,9 +68,9 @@ public class User implements Serializable {
 	}
 
 	/**
-	 * 회원 탈퇴 처리 (계정 비활성화)
+	 * 회원 탈퇴 처리
 	 * 
-	 * @param password 비밀번호 확인용
+	 * @param password 비밀번호 확인
 	 * @return 탈퇴 성공 여부
 	 */
 	public boolean deleteUser(String password) {
@@ -92,14 +92,6 @@ public class User implements Serializable {
 	public boolean loginUser(String email, String password) {
 		// 이메일과 비밀번호 확인
 		return this.email.equals(email) && this.password.equals(PasswordEncryptor.encrypt(password));
-	}
-
-	/**
-	 * 로그아웃 처리
-	 */
-	public void logoutUser() {
-		// 로그아웃 시 특별한 처리 없음
-		// 세션 관리는 컨트롤러에서 담당
 	}
 
 	/**

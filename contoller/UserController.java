@@ -10,7 +10,7 @@ import service.UserService;
 import util.FileUtil;
 
 /**
- * 사용자 관련 요청을 처리하는 컨트롤러 클래스
+ * 사용자 관련 요청 처리 컨트롤러
  */
 public class UserController {
 	// 사용자 관련 비즈니스 로직 서비스
@@ -26,7 +26,7 @@ public class UserController {
 	private String currentUserEmail = null;
 	
 	/**
-	 * 생성자 - UserService 초기화
+	 * 생성자 - 서비스 초기화
 	 */
 	public UserController() {
 		this.userService = new UserService();
