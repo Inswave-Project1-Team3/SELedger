@@ -124,7 +124,7 @@ public class UserTest {
 				"이메일 형식이 올바르지 않습니다. 다시 입력해주세요.");
 		
 		System.out.print("비밀번호: ");
-		String password = scanner.next();
+		String password = scanner.nextLine();
 		
 		LoginUserDTO dto = new LoginUserDTO(email, password);
 		boolean result = userController.login(dto);
@@ -150,10 +150,10 @@ public class UserTest {
 		}
 		
 		System.out.print("현재 비밀번호: ");
-		String currentPassword = scanner.next();
+		String currentPassword = scanner.nextLine();
 		
 		System.out.println("새 이메일 (변경하지 않으려면 'skip' 입력): ");
-		String newEmail = scanner.next();
+		String newEmail = scanner.nextLine();
 		if (newEmail.equalsIgnoreCase("skip"))
 			newEmail = null;
 		else if (!InputValidator.isValidEmail(newEmail)) {
@@ -162,7 +162,7 @@ public class UserTest {
 		}
 		
 		System.out.println("새 비밀번호 (8자리 이상 16자리 이하, 특수문자 포함, 변경하지 않으려면 'skip' 입력): ");
-		String newPassword = scanner.next();
+		String newPassword = scanner.nextLine();
 		if (newPassword.equalsIgnoreCase("skip"))
 			newPassword = null;
 		else if (!InputValidator.isValidPassword(newPassword)) {
@@ -204,7 +204,7 @@ public class UserTest {
 		}
 		
 		System.out.println("정말 탈퇴하시겠습니까? (Y/N)");
-		String confirm = scanner.next();
+		String confirm = scanner.nextLine();
 		
 		if (!confirm.equalsIgnoreCase("Y")) {
 			System.out.println("회원탈퇴가 취소되었습니다.");
@@ -212,7 +212,7 @@ public class UserTest {
 		}
 		
 		System.out.print("비밀번호: ");
-		String password = scanner.next();
+		String password = scanner.nextLine();
 		
 		User currentUser = userController.getCurrentUser();
 		if (currentUser == null) {
@@ -296,7 +296,7 @@ public class UserTest {
 		String input;
 		do {
 			System.out.print(prompt);
-			input = scanner.next();
+			input = scanner.nextLine();
 			
 			if (!validator.test(input))
 				System.out.println(errorMessage);

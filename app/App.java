@@ -48,7 +48,7 @@ public class App {
         while (true) {
             if (!loginCheck) {
                 mainPage.anonymousMainPage();
-                int number = stringCheck.numberCheck(sc.nextLine());
+                int number = stringCheck.numberCheck(sc);
 
                 switch (number) {
                     case 1:
@@ -106,7 +106,7 @@ public class App {
         accountBookPage.accountMainPage(vo);
 
         System.out.println("1. 상세요일 보기/2. 친구 가계부 보기/3. 회원정보 조회/4. 회원정보 수정 /7. 뒤로가기/8. 회원탈퇴/9. 로그아웃/0. 프로그램 종료");
-        int number = stringcheck.numberCheck(sc.nextLine());
+        int number = stringcheck.numberCheck(sc);
 
         switch (number) {
             case 1:
@@ -149,8 +149,8 @@ public class App {
 
     private void viewDetailedDay() {
         System.out.println("조회하고 싶은 월수와 일수를 입력해주세요");
-        month = stringcheck.monthCheck(Integer.parseInt(sc.nextLine()));
-        day = stringcheck.dayCheck(Integer.parseInt(sc.nextLine()));
+        month = stringcheck.monthCheck(sc);
+        day = stringcheck.dayCheck(sc);
 
         DayAccountBook dayAccountBook = (visitUserNickname.isEmpty()) ?
                 accountBookController.getDayAccountBook(day, userNickName) :
@@ -160,7 +160,7 @@ public class App {
 
 
         System.out.println("1. 내역 추가 / 2. 내역 수정 / 3. 내역 삭제 / 4. 댓글달기 / 5. 댓글보기 / 9. 뒤로가기");
-        int accountBookNumber = stringcheck.numberCheck(sc.nextLine());
+        int accountBookNumber = stringcheck.numberCheck(sc);
         switch (accountBookNumber) {
             case 1:
                 addTransaction(day);
@@ -208,7 +208,7 @@ public class App {
         System.out.println("아래의 값을 순서대로 입력해주세요");
         System.out.println("1. 가격");
         System.out.println("2. 메모내용");
-        long money = stringcheck.longCheck(sc.nextLine());
+        long money = stringcheck.longCheck(sc);
         String memo = sc.nextLine();
 
         accountBookController.createDayAccountBook(
@@ -221,7 +221,7 @@ public class App {
         if (!isUserAuthorized()) return;
 
         System.out.println("몇번째 값을 수정하시겠습니까?");
-        int transactionNumber = stringcheck.numberCheck(sc.nextLine());
+        int transactionNumber = stringcheck.numberCheck(sc);
         System.out.println("수익이면 0, 지출이면 1");
         boolean benefitCheck = (sc.nextLine().equals("0"));
 
@@ -244,7 +244,7 @@ public class App {
     private void deleteTransaction() {
         if (!isUserAuthorized()) return;
         System.out.println("몇번째 값을 삭제하시겠습니까?");
-        accountBookController.deleteDayAccountBook(stringCheck.numberCheck(sc.nextLine()), day);
+        accountBookController.deleteDayAccountBook(stringCheck.numberCheck(sc), day);
 
     }
 
