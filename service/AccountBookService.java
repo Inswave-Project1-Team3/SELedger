@@ -137,6 +137,7 @@ public class AccountBookService implements Serializable {
         return new GetMonthDataVO(daysMoney, category, maxCategoryMoney, monthTotalMoney);
     }
 
+    // 가계부 수정
     public void updateDayAccountBook(UpdateTransactionAccountBookDTO dto, int transactionNumber, int day) {
         Map<Integer, DayAccountBook> monthAccountBook = getToFile(userNickName);
         Optional.ofNullable(monthAccountBook.get(day))
@@ -147,6 +148,7 @@ public class AccountBookService implements Serializable {
         saveToFile(monthAccountBook);
     }
 
+    // 가계부 삭제
     public void deleteDayAccountBook(int transactionNumber, int day) {
         Map<Integer, DayAccountBook> monthAccountBook = getToFile(userNickName);
         Optional.ofNullable(monthAccountBook.get(day))

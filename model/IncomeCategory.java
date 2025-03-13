@@ -7,7 +7,6 @@ public enum IncomeCategory implements AccountCategory {
 	ALLOWANCE("\uD83D\uDCB2 용돈");
 
 	private final String description;
-	// Income Categories
 
 	IncomeCategory(String description) {
 		this.description = description;

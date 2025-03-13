@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
  */
 public class InputValidator {
 	/** 이메일 정규 표현식 */
-	private static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,256}$";
+	private static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]{1,64}@[a-zA-Z0-9.-]{1,189}$";
 	
 	/** 비밀번호 정규 표현식 (8자 이상, 특수문자 포함) */
 	private static final String PASSWORD_REGEX = "^(?=.*[!@#$%^&*(),.?\":{}|<>])(?=\\S+$).{8,16}$";

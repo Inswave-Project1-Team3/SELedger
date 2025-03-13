@@ -133,6 +133,7 @@ public class App {
                 // 로그아웃 시 닉네임 정보 초기화
                 userNickName = "";
                 visitUserNickname = "";
+                month = LocalDateTime.now().getMonthValue();
                 break;
 
             case 0: // 프로그램 종료
@@ -233,9 +234,15 @@ public class App {
         accountBookPage.categoryView(benefitCheck);
         String input = sc.next().toUpperCase();
 
-        AccountCategory accountCategory = (benefitCheck) ?
-                IncomeCategory.valueOf(input) :
-                ExpenseCategory.valueOf(input);
+        AccountCategory accountCategory = null;
+        try {
+            accountCategory = (benefitCheck) ?
+                    IncomeCategory.valueOf(input) :
+                    ExpenseCategory.valueOf(input);
+        } catch (IllegalArgumentException e) {
+            System.out.println("화면에 표시된 값만 입력 가능합니다. 다시 입력해주세요");
+            return;
+        }
 
         System.out.println("가격");
         long money = sc.nextLong();
@@ -256,7 +263,7 @@ public class App {
     private void getToUser() {
         System.out.println("방문할 유저의 nickName 을 입력해주세요. 존재하지 않는 user 라면 방문하지 않습니다");
         String inputUserName = sc.next();
-        if (userController.checkNicknameExists(inputUserName)) {
+        if (userController.checkNicknameExists(inputUserName) && (!userNickName.equals(inputUserName))) {
             visitUserNickname = inputUserName;
         } else {
             System.out.println("존재하지 않는 유저이거나, 본인의 nickname 을 입력하셨습니다. 다시 입력해주세요");
