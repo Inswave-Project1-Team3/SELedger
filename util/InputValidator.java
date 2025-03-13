@@ -20,12 +20,8 @@ public class InputValidator {
 	private static final Pattern PASSWORD_PATTERN = Pattern.compile(PASSWORD_REGEX);
 	private static final Pattern NICKNAME_PATTERN = Pattern.compile(NICKNAME_REGEX);
 	
-	/**
-	 * 이메일 형식 검증
-	 * 
-	 * @param email 검증할 이메일
-	 * @return 유효 여부
-	 */
+
+	// 이메일 형식 검증
 	public static boolean isValidEmail(String email) {
 		if (email == null || email.isEmpty())
 			return false;
@@ -33,40 +29,23 @@ public class InputValidator {
 		return EMAIL_PATTERN.matcher(email).matches();
 	}
 	
-	/**
-	 * 비밀번호 형식 검증
-	 * 
-	 * @param password 검증할 비밀번호
-	 * @return 유효 여부
-	 */
+	// 비밀번호 형식 검증
 	public static boolean isValidPassword(String password) {
 		if (password == null || password.isEmpty())
 			return false;
 		
 		return PASSWORD_PATTERN.matcher(password).matches();
 	}
-	
-	/**
-	 * 닉네임 형식 검증
-	 * 
-	 * @param nickname 검증할 닉네임
-	 * @return 유효 여부
-	 */
+
+	//  닉네임 형식 검증
 	public static boolean isValidNickname(String nickname) {
 		if (nickname == null || nickname.isEmpty())
 			return false;
 		
 		return NICKNAME_PATTERN.matcher(nickname).matches();
 	}
-	
-	/**
-	 * 사용자 입력값 통합 검증
-	 * 
-	 * @param email 이메일
-	 * @param password 비밀번호
-	 * @param nickname 닉네임
-	 * @return 오류 메시지 (유효하면 null)
-	 */
+
+	//통합 검증
 	public static String validateUserInput(String email, String password, String nickname) {
 		if (!isValidEmail(email))
 			return "이메일 형식이 올바르지 않습니다. (예: example@domain.com)";

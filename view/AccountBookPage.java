@@ -61,8 +61,14 @@ public class AccountBookPage {
             }
             printWeekRow(weekCells);
         }
-        System.out.println("이번달 " + vo.getAccountCategory() + " 에 " + vo.getMaxCategoryMoney() + "원으로 가장 많은 지출이 발생했습니다");
-        System.out.println("이번달 총 수입 및 지출량 : " + vo.getMonthTotalMoney() + "원");
+
+        if(vo.getAccountCategory() != null) {
+            System.out.println(month + "월은 " + vo.getAccountCategory() + " 에 " + vo.getMaxCategoryMoney() + "원으로 가장 많은 지출이 발생했습니다");
+        } else {
+            System.out.println(month + "월은 지출이 없습니다.");
+        }
+
+        System.out.println(month + "월 총 수입 및 지출량 : " + vo.getMonthTotalMoney() + "원");
     }
 
     private static String[] emptyCell() {
@@ -77,8 +83,8 @@ public class AccountBookPage {
         String[] cell = new String[CELL_HEIGHT];
         cell[0] = String.valueOf(day);
         if (data != null) {
-            cell[1] = " + " + data.getIncome();
-            cell[2] = " - " + data.getExpense();
+            cell[1] = (data.getIncome() != 0) ? " + " + data.getIncome() : "";
+            cell[2] = (data.getExpense() != 0) ? " - " + data.getExpense() : "";
         } else {
             cell[1] = "";
             cell[2] = "";
