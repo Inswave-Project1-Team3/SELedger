@@ -106,6 +106,7 @@ public class App {
         accountBookPage.accountMainPage(vo);
 
         System.out.println("1. 상세요일 보기/2. 친구 가계부 보기/3. 회원정보 조회/4. 회원정보 수정 /7. 뒤로가기/8. 회원탈퇴/9. 로그아웃/0. 프로그램 종료");
+        sc.nextLine();
         int number = stringcheck.numberCheck(sc.nextLine());
 
         switch (number) {
