@@ -12,39 +12,43 @@ import java.util.Map.Entry;
 
 import static app.App.*;
 
-/**
- * 가계부 관련 비즈니스 로직 처리
- */
 public class AccountBookService implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final String USER_DATA_FOLDER = "data";
 
-    /**
-     * 선택한 날짜에 가계부 항목 생성
-     */
+    // 선택한 날의 가계부 생성
     public void createAccountBook(CreateAccountBookDTO accountBookDTO,
                                   CreateTransactionAccountBookDTO transactionAccountBookDTO,
                                   int day) {
 
-        Map<Integer, DayAccountBook> monthAccountBook = (visitUserNickname.isEmpty()) ?
-            getToFile(userNickName) :
-            getToFile(visitUserNickname);
+        // 월별로 저장된 값을 가져오기
+        Map<Integer, DayAccountBook> monthAccountBook = getToFile(userNickName);
 
+        // 가져온 값에서 추가하여야 할 리스트 가져오기
+        List<TransactionAccountBook> list = (monthAccountBook.containsKey(day)) ?
+                monthAccountBook.get(day).getTransactionAccountBooks() :
+                new ArrayList<>();
+
+        // 리스트에 추가할 값 생성
         TransactionAccountBook transactionAccountBook = new TransactionAccountBook(
                 transactionAccountBookDTO.isBenefit(),
                 transactionAccountBookDTO.getMoney(),
                 transactionAccountBookDTO.getAccountCategory());
 
-        List<TransactionAccountBook> list = (monthAccountBook.containsKey(day)) ?
-                monthAccountBook.get(day).getTransactionAccountBooks() :
-                new ArrayList<>();
-
+        // 리스트에 추가
         list.add(transactionAccountBook);
 
-        DayAccountBook dayAccountBook = new DayAccountBook(accountBookDTO.getMemo(), list);
 
+        // 기존 DayAccountBook 객체가 존재하면 수정하고, 없으면 새로 생성
+        DayAccountBook dayAccountBook = monthAccountBook.getOrDefault(day, new DayAccountBook(accountBookDTO.getMemo(), list));
+
+        // 리스트에 추가된 값을 넣은 객체를 새로생성
+        //DayAccountBook dayAccountBook = new DayAccountBook(accountBookDTO.getMemo(), list);
+
+        // 새로 생성된 값을 넣음
         monthAccountBook.put(day, dayAccountBook);
 
+        // 저장
         saveToFile(monthAccountBook);
     }
 
@@ -88,52 +92,47 @@ public class AccountBookService implements Serializable {
         return monthAccountBook;
     }
 
+
     public DayAccountBook getDayAccountBook(int day, String userNickName) {
         Map<Integer, DayAccountBook> monthAccountBook = getToFile(userNickName);
 
         return (monthAccountBook.containsKey(day)) ? monthAccountBook.get(day) : new DayAccountBook();
     }
-  
+
     public GetMonthDataVO getMonthMoney(String userNickName){
 
-        Map<Integer, DayAccountBook> monthAccountBook = getToFile(userNickName); // 월별 거래내역
-        Map<Integer, DayMoney> daysMoney = new HashMap<>();             // key : 일수, DayMoney : 일일 총 수익 및 지출 
-        Map<AccountCategory, Long> categoryMoneyCheck = new HashMap<>();     // 가장
+        Map<Integer, DayAccountBook> monthAccountBook = getToFile(userNickName);    // 월별 거래내역
+        Map<Integer, DayMoney> daysMoney = new HashMap<>();                         // key : 일수, DayMoney : 일일 총 수익 및 지출
+        Map<AccountCategory, Long> categoryMoneyCheck = new HashMap<>();            // 지출이 가장 많은 카테고리 및 금액
 
-        long income = 0;                    // 월별 총 수익
-        long expense = 0;                   // 월별 총 지출
         long money;                     //가계부 건당 수익 및 지출비용
         AccountCategory category = null;    //월별 가장 많이 지출한 카테고리
         long maxCategoryMoney = 0;          //category 에서 사용한 금액
         long monthTotalMoney = 0;           //이번달 총 지출 민 수익내역// 돈을 많이 쓰는 카테고리를 반한하기 위한 map
 
-        // 모든 일자의 데이터를 합산
         for(Entry<Integer, DayAccountBook> dayMoney : monthAccountBook.entrySet()){
-            long dailyIncome= 0;            //일수별 수익
-            long dailyExpense = 0;          //일수별 지출
+            long dailyIncome = 0;            //일수별 수익
+            long dailyexpense = 0;          //일수별 지출
 
             for(TransactionAccountBook transactionAccountBook : dayMoney.getValue().getTransactionAccountBooks()) {
                 money = transactionAccountBook.getMoney();
                 if(transactionAccountBook.isBenefit()){
                     dailyIncome += money;
-                    income += money;
                 }
                 else {
-                    dailyExpense += money;
-                    expense += money;
+                    dailyexpense += money;
                     category = transactionAccountBook.getAccountCategory();
-                    categoryMoneyCheck.put(category, categoryMoneyCheck.getOrDefault(category, 0L) + money);
+                    categoryMoneyCheck.put(category, categoryMoneyCheck.getOrDefault(category, 0L)  + money);
                 }
+                daysMoney.put(dayMoney.getKey(), new DayMoney(dailyIncome, dailyexpense));
             }
-          
-            monthTotalMoney = income - expense;
+            monthTotalMoney += dailyIncome - dailyexpense;
 
             if (!categoryMoneyCheck.isEmpty()) {
                 Entry<AccountCategory, Long> maxEntry = Collections.max(categoryMoneyCheck.entrySet(), Entry.comparingByValue());
                 category = maxEntry.getKey();
                 maxCategoryMoney = maxEntry.getValue();
             }
-            daysMoney.put(dayMoney.getKey(), new DayMoney(dailyIncome, dailyExpense));
         }
         return new GetMonthDataVO(daysMoney, category, maxCategoryMoney, monthTotalMoney);
     }
@@ -157,6 +156,5 @@ public class AccountBookService implements Serializable {
         saveToFile(monthAccountBook);
     }
 }
-
 
 

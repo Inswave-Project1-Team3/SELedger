@@ -8,12 +8,10 @@ import java.util.List;
 
 
 import lombok.Getter;
-import lombok.AllArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
 public class DayAccountBook implements Serializable {
     private static final long serialVersionUID = 1L; // 직렬화 버전 ID
     private String createDate;
