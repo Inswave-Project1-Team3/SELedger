@@ -1,6 +1,5 @@
 package app;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Scanner;
 
@@ -72,11 +71,11 @@ public class App {
     private void signUp() {
         mainPage.showSignupGuide(); // 회원가입 입력 형식 안내
         System.out.print("이메일: ");
-        String email = sc.nextLine();
+        String email = sc.next();
         System.out.print("비밀번호: ");
-        String password = sc.nextLine();
+        String password = sc.next();
         System.out.print("닉네임: ");
-        String nickname = sc.nextLine();
+        String nickname = sc.next();
 
         userController.createUser(new CreateUserDTO(email, password, nickname));
     }
@@ -84,9 +83,9 @@ public class App {
     private void login() {
         mainPage.showLoginGuide(); // 로그인 입력 형식 안내
         System.out.print("이메일: ");
-        String email = sc.nextLine();
+        String email = sc.next();
         System.out.print("비밀번호: ");
-        String password = sc.nextLine();
+        String password = sc.next();
 
         if (userController.login(new LoginUserDTO(email, password))) {
             userNickName = userController.getCurrentUserNickName();
@@ -194,7 +193,7 @@ public class App {
 
         System.out.println("카테고리");
         accountBookPage.categoryView(benefitCheck);
-        String input = sc.nextLine().toUpperCase();
+        String input = sc.next().toUpperCase();
         AccountCategory accountCategory = null;
         try {
             accountCategory = (benefitCheck) ?
@@ -209,7 +208,7 @@ public class App {
         System.out.println("1. 가격");
         System.out.println("2. 메모내용");
         long money = stringcheck.longCheck(sc);
-        String memo = sc.nextLine();
+        String memo = sc.next();
 
         accountBookController.createDayAccountBook(
                 new CreateAccountBookDTO(memo),
@@ -223,11 +222,11 @@ public class App {
         System.out.println("몇번째 값을 수정하시겠습니까?");
         int transactionNumber = stringcheck.numberCheck(sc);
         System.out.println("수익이면 0, 지출이면 1");
-        boolean benefitCheck = (sc.nextLine().equals("0"));
+        boolean benefitCheck = (sc.next().equals("0"));
 
         System.out.println("카테고리");
         accountBookPage.categoryView(benefitCheck);
-        String input = sc.nextLine().toUpperCase();
+        String input = sc.next().toUpperCase();
 
         AccountCategory accountCategory = (benefitCheck) ?
                 IncomeCategory.valueOf(input) :
@@ -251,7 +250,7 @@ public class App {
     // 다른 유저의 보기
     private void getToUser() {
         System.out.println("방문할 유저의 nickName 을 입력해주세요. 존재하지 않는 user 라면 방문하지 않습니다");
-        String inputUserName = sc.nextLine();
+        String inputUserName = sc.next();
         if (userController.checkNicknameExists(inputUserName)) {
             visitUserNickname = inputUserName;
         } else {
@@ -279,10 +278,10 @@ public class App {
         // 회원정보 수정
         System.out.println("\n----- 회원정보 수정 -----");
         System.out.println("현재 비밀번호를 입력하세요:");
-        String currentPassword = sc.nextLine();
+        String currentPassword = sc.next();
 
         System.out.println("새 이메일을 입력하세요 (변경하지 않으려면 'skip' 입력):");
-        String newEmail = sc.nextLine();
+        String newEmail = sc.next();
         if (newEmail.equalsIgnoreCase("skip"))
             newEmail = null;
         else if (!InputValidator.isValidEmail(newEmail)) {
@@ -290,7 +289,7 @@ public class App {
             return;
         }
         System.out.println("새 비밀번호를 입력하세요 (8자리 이상 16자리 이하, 특수문자 포함, 변경하지 않으려면 'skip' 입력):");
-        String newPassword = sc.nextLine();
+        String newPassword = sc.next();
         if (newPassword.equalsIgnoreCase("skip"))
             newPassword = null;
         else if (!InputValidator.isValidPassword(newPassword)) {
@@ -307,11 +306,11 @@ public class App {
     private void deleteID() {
         System.out.println("\n----- 회원탈퇴 -----");
         System.out.println("정말 탈퇴하시겠습니까? (Y/N)");
-        String confirm = sc.nextLine();
+        String confirm = sc.next();
 
         if (confirm.equalsIgnoreCase("Y")) {
             System.out.println("비밀번호를 입력하세요:");
-            String password = sc.nextLine();
+            String password = sc.next();
 
             boolean deleteCheck = userController.deleteUser(new DeleteUserDTO(userEmail, password));
             if(deleteCheck) {
@@ -336,7 +335,7 @@ public class App {
      */
     private void addCommentToDay() {
         System.out.println("댓글을 입력하세요:");
-        String comment = sc.nextLine();
+        String comment = sc.next();
         
         contoller.CommentController commentController = new contoller.CommentController();
         
