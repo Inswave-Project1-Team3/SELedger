@@ -8,10 +8,6 @@ import app.App;
 
 public class CommentController {
     CommentService commentService = new CommentService();
-
-    public List<Comment> getCommnet(){
-        return commentService.searchComments();
-    }
     
     /**
      * 현재 사용자의 특정 일에 해당하는 댓글 목록 조회 및 출력

@@ -17,10 +17,7 @@ public class UserController {
 	
 	// 현재 로그인한 사용자 닉네임
 	private String currentUserNickName = null;
-	
-	// 로그인 상태
-	private boolean isLoggedIn = false;
-	
+
 	// 현재 로그인한 사용자 이메일
 	private String currentUserEmail = null;
 	
@@ -66,7 +63,6 @@ public class UserController {
 		boolean result = userService.login(dto);
 		if (result) {
 			// 로그인 성공 시 컨트롤러 내부 상태 업데이트
-			this.isLoggedIn = true;
 			this.currentUserEmail = dto.getEmail();
 
 			// 사용자 정보를 조회하여 닉네임 설정
@@ -108,11 +104,6 @@ public class UserController {
 	 */
 	public boolean updateUser(UpdateUserDTO dto) {
 		try {
-			// 로그인 상태 확인
-			if (!isLoggedIn) {
-				System.out.println("로그인 후 이용 가능합니다.");
-				return false;
-			}
 			
 			// 현재 로그인한 사용자와 수정 요청한 사용자가 일치하는지 확인
 			User currentUser = userService.getUserByNickName(currentUserNickName);
@@ -151,11 +142,6 @@ public class UserController {
 	 * @return 탈퇴 성공 여부
 	 */
 	public boolean deleteUser(DeleteUserDTO dto) {
-		// 로그인 상태 확인
-		if (!isLoggedIn) {
-			System.out.println("로그인 후 이용 가능합니다.");
-			return false;
-		}
 		
 		// 현재 로그인한 사용자와 탈퇴 요청한 사용자가 일치하는지 확인
 		User currentUser = userService.getUserByNickName(currentUserNickName);
@@ -182,19 +168,10 @@ public class UserController {
 	 * @return 현재 사용자 객체 (없으면 null)
 	 */
 	public User getCurrentUser() {
-		if (!isLoggedIn || currentUserNickName == null)
+		if (currentUserNickName == null)
 			return null;
 		
 		return userService.getUserByNickName(currentUserNickName);
-	}
-	
-	/**
-	 * 로그인 상태 확인
-	 * 
-	 * @return 로그인 여부
-	 */
-	public boolean isLoggedIn() {
-		return isLoggedIn;
 	}
 	
 	/**
@@ -204,27 +181,6 @@ public class UserController {
 	 */
 	public String getCurrentUserNickName() {
 		return currentUserNickName;
-	}
-	
-	/**
-	 * 현재 로그인한 사용자 이메일 조회
-	 * 
-	 * @return 현재 사용자 이메일
-	 */
-	public String getCurrentUserEmail() {
-		return currentUserEmail;
-	}
-	
-	/**
-	 * 현재 사용자의 데이터 디렉토리 경로 조회
-	 * 
-	 * @return 데이터 디렉토리 경로
-	 */
-	public String getCurrentUserDirectoryPath() {
-		if (!isLoggedIn || currentUserNickName == null)
-			return null;
-		
-		return "data/" + currentUserNickName;
 	}
 
 	/**
@@ -241,7 +197,6 @@ public class UserController {
 	 * 세션 정보 초기화
 	 */
 	private void resetSession() {
-		this.isLoggedIn = false;
 		this.currentUserNickName = null;
 		this.currentUserEmail = null;
 	}
