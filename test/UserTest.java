@@ -96,8 +96,8 @@ public class UserTest {
 		String email = getValidatedInput("이메일: ", InputValidator::isValidEmail, 
 				"이메일 형식이 올바르지 않습니다. 다시 입력해주세요.");
 		
-		String password = getValidatedInput("비밀번호 (8자리 이상, 특수문자 포함): ", InputValidator::isValidPassword, 
-				"비밀번호는 8자리 이상이며, 최소 하나 이상의 특수문자를 포함해야 합니다. 다시 입력해주세요.");
+		String password = getValidatedInput("비밀번호 (8자리 이상 16자리 이하, 특수문자 포함): ", InputValidator::isValidPassword,
+				"비밀번호는 8자리 이상 16자리 이하 이며, 최소 하나 이상의 특수문자를 포함해야 합니다. 다시 입력해주세요.");
 		
 		System.out.println("주의: 닉네임은 회원가입 후 변경할 수 없습니다.");
 		String nickname = getValidatedInput("닉네임 (한글, 영문, 숫자만 허용, 2~12자): ", InputValidator::isValidNickname, 
@@ -161,12 +161,12 @@ public class UserTest {
 			return;
 		}
 		
-		System.out.println("새 비밀번호 (8자리 이상, 특수문자 포함, 변경하지 않으려면 'skip' 입력): ");
+		System.out.println("새 비밀번호 (8자리 이상 16자리 이하, 특수문자 포함, 변경하지 않으려면 'skip' 입력): ");
 		String newPassword = scanner.next();
 		if (newPassword.equalsIgnoreCase("skip"))
 			newPassword = null;
 		else if (!InputValidator.isValidPassword(newPassword)) {
-			System.out.println("새 비밀번호는 8자리 이상이며, 최소 하나 이상의 특수문자를 포함해야 합니다.");
+			System.out.println("새 비밀번호는 8자리 이상 16자리 이하 이며, 최소 하나 이상의 특수문자를 포함해야 합니다.");
 			return;
 		}
 		

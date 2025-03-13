@@ -221,7 +221,7 @@ public class UserService {
 		// 새 비밀번호가 있는 경우 검증
 		if (dto.getNewPassword() != null && !dto.getNewPassword().isEmpty()) {
 			if (!InputValidator.isValidPassword(dto.getNewPassword()))
-				throw new IllegalArgumentException("새 비밀번호는 8자리 이상이며, 최소 하나 이상의 특수문자를 포함해야 합니다.");
+				throw new IllegalArgumentException("새 비밀번호는 8자리 이상 16자리 이하 이며, 최소 하나 이상의 특수문자를 포함해야 합니다.");
 		}
 
 		// 닉네임 변경 요청이 있는 경우 경고 메시지 출력 후 무시

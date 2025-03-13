@@ -289,12 +289,12 @@ public class App {
             System.out.println("이메일 형식이 올바르지 않습니다.");
             return;
         }
-        System.out.println("새 비밀번호를 입력하세요 (8자리 이상, 특수문자 포함, 변경하지 않으려면 'skip' 입력):");
+        System.out.println("새 비밀번호를 입력하세요 (8자리 이상 16자리 이하, 특수문자 포함, 변경하지 않으려면 'skip' 입력):");
         String newPassword = sc.next();
         if (newPassword.equalsIgnoreCase("skip"))
             newPassword = null;
         else if (!InputValidator.isValidPassword(newPassword)) {
-            System.out.println("새 비밀번호는 8자리 이상이며, 최소 하나 이상의 특수문자를 포함해야 합니다.");
+            System.out.println("새 비밀번호는 8자리 이상 16자리 이하 이며, 최소 하나 이상의 특수문자를 포함해야 합니다.");
             return;
         }
         // 닉네임은 변경할 수 없으므로 null로 설정
