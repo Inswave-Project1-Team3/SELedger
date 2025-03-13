@@ -1,54 +1,97 @@
 package contoller;
 
+import java.util.ArrayList;
+import java.util.List;
 
-import DTO.CreateCommentDTO;
+import model.Comment;
 import service.CommentService;
+import app.App;
 
+/**
+ * 댓글 관련 요청 처리 컨트롤러
+ */
 public class CommentController {
-	CreateCommentDTO dtoData = new CreateCommentDTO(); // DTO 데이터 가져오기
-    CommentService service = new CommentService(); // Service 가져오기
+	CommentService commentService = new CommentService();
 
-    public void handleRequest() {  // 요청 처리 메서드
-        if (dtoData.ownerNickName == null || dtoData.writerNickName == null) {
-            System.out.println("이메일 또는 닉네임이 올바르지 않습니다.");
-            return;
-        }
-        
-        if ((dtoData.commentSwitchNumber == 1 || dtoData.commentSwitchNumber == 3) && dtoData.context == null) {
-            System.out.println("댓글 내용을 입력하세요.");
-            return;
-        }
-        
-        //파일 읽기
-        service.loadCommentsFromFile(dtoData.addressFile);
-        
-        switch (dtoData.commentSwitchNumber) {
-            case 1: // 댓글 생성
-                service.addComment(dtoData.ownerNickName, dtoData.writerNickName, dtoData.context);
-                System.out.println("댓글이 생성되었습니다.");
-                break;
-            case 2: // 댓글 보기
-                var comments = service.getAllComment(dtoData.ownerNickName);
-                if (comments.isEmpty()) {
-                    System.out.println("작성된 댓글이 없습니다.");
-                } else {
-                    comments.forEach((nick, comment) -> System.out.println(nick + ": " + comment));
-                }
-                break;
-            case 3: // 댓글 수정
-                service.updateComment(dtoData.ownerNickName, dtoData.writerNickName, dtoData.context);
-                System.out.println("댓글이 수정되었습니다.");
-                break;
-            case 4: // 댓글 삭제
-                service.removeComment(dtoData.ownerNickName, dtoData.writerNickName);
-                System.out.println("댓글이 삭제되었습니다.");
-                break;
-            default:
-                System.out.println("비정상적인 입력입니다.");
-        }
-        //파일에 저장
-        service.saveCommentsToFile(dtoData.addressFile);
-    }
+	/**
+	 * 모든 댓글 조회
+	 * 
+	 * @return 댓글 목록
+	 */
+	public List<Comment> getCommnet(){
+		return commentService.searchComments();
+	}
+	
+	/**
+	 * 특정 일자 댓글 조회 및 출력
+	 * 
+	 * @param day 조회할 일
+	 */
+	public void showCommentByDay(int day) {
+		List<Comment> results = commentService.searchCommentsByDay(day);
+		
+		if (results.isEmpty()) {
+			System.out.println("댓글이 없습니다.");
+		} else {
+			System.out.println("===== " + App.userNickName + "님의 " + App.month + "월 " + day + "일 댓글 목록 =====");
+			for (Comment comment : results) {
+				System.out.println("[작성자: " + comment.getAuthor() + "] " + comment.getcontext());
+			}
+			System.out.println("===============================");
+		}
+	}
+	
+	/**
+	 * 특정 사용자의 특정 일자 댓글 조회 및 출력
+	 * 
+	 * @param nickname 사용자 닉네임
+	 * @param month 조회할 월
+	 * @param day 조회할 일
+	 */
+	public void showCommentByUserAndDay(String nickname, int month, int day) {
+		List<Comment> results = commentService.searchCommentsByUserAndDay(nickname, month, day);
+		
+		if (results.isEmpty()) {
+			System.out.println("댓글이 없습니다.");
+		} else {
+			System.out.println("===== " + nickname + "님의 " + month + "월 " + day + "일 댓글 목록 =====");
+			for (Comment comment : results) {
+				System.out.println("[작성자: " + comment.getAuthor() + "] " + comment.getcontext());
+			}
+			System.out.println("===============================");
+		}
+	}
+	
+	/**
+	 * 자신의 가계부에 댓글 추가
+	 * 
+	 * @param context 댓글 내용
+	 * @param day 댓글 작성 일자
+	 */
+	public void addComment(String context, int day) {
+		commentService.addCommentWithContext(context, day);
+		System.out.println("댓글이 추가되었습니다.");
+	}
+	
+	/**
+	 * 친구 가계부에 댓글 추가
+	 * 
+	 * @param friendNickname 친구 닉네임
+	 * @param context 댓글 내용
+	 * @param month 월
+	 * @param day 일
+	 */
+	public void addCommentToFriend(String friendNickname, String context, int month, int day) {
+		commentService.addCommentToFriendAccountBook(friendNickname, context, month, day);
+		System.out.println(friendNickname + "님의 가계부에 댓글이 추가되었습니다.");
+	}
+	
+	/**
+	 * 댓글 관리 기능
+	 */
+	public void controllComment() {
+		// 추후 구현 예정
+	}
 }
 
 

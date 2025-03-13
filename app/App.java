@@ -158,9 +158,9 @@ public class App {
 
         accountBookPage.DayAccountBookPage(dayAccountBook, month, day);
 
-        System.out.println("1. 내역 추가 / 2. 내역 수정 / 3. 내역 삭제 / 4. 댓글달기 / 9. 뒤로가기");
-        int accountBookNumber = stringcheck.numberCheck(sc);
 
+        System.out.println("1. 내역 추가 / 2. 내역 수정 / 3. 내역 삭제 / 4. 댓글달기 / 5. 댓글보기 / 9. 뒤로가기");
+        int accountBookNumber = stringcheck.numberCheck(sc.next());
         switch (accountBookNumber) {
             case 1:
                 addTransaction(day);
@@ -170,6 +170,12 @@ public class App {
                 break;
             case 3:
                 deleteTransaction();
+                break;
+            case 4: // 댓글달기
+                addCommentToDay();
+                break;
+            case 5: // 댓글보기
+                showComments();
                 break;
             case 9: // 뒤로가기
                 visitUserNickname = "";
@@ -325,5 +331,38 @@ public class App {
         return true;
     }
 
+    /**
+     * 현재 선택된 날짜에 댓글 추가
+     */
+    private void addCommentToDay() {
+        System.out.println("댓글을 입력하세요:");
+        sc.nextLine(); // 버퍼 비우기
+        String comment = sc.nextLine();
+        
+        contoller.CommentController commentController = new contoller.CommentController();
+        
+        if (visitUserNickname.isEmpty()) {
+            // 자신의 가계부에 댓글 추가
+            commentController.addComment(comment, day);
+        } else {
+            // 친구 가계부에 댓글 추가
+            commentController.addCommentToFriend(visitUserNickname, comment, month, day);
+        }
+    }
+    
+    /**
+     * 현재 선택된 가계부의 댓글 목록 조회
+     */
+    private void showComments() {
+        contoller.CommentController commentController = new contoller.CommentController();
+        
+        if (visitUserNickname.isEmpty()) {
+            // 자신의 가계부 댓글 조회 (특정 날짜)
+            commentController.showCommentByDay(day);
+        } else {
+            // 친구 가계부 댓글 조회 (특정 날짜)
+            commentController.showCommentByUserAndDay(visitUserNickname, month, day);
+        }
+    }
 
 }

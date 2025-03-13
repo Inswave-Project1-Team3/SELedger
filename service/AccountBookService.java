@@ -12,11 +12,16 @@ import java.util.Map.Entry;
 
 import static app.App.*;
 
+/**
+ * 가계부 관련 비즈니스 로직 처리
+ */
 public class AccountBookService implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final String USER_DATA_FOLDER = "data";
 
-    // 선택한 날의 가계부 생성
+    /**
+     * 선택한 날짜에 가계부 항목 생성
+     */
     public void createAccountBook(CreateAccountBookDTO accountBookDTO,
                                   CreateTransactionAccountBookDTO transactionAccountBookDTO,
                                   int day) {
@@ -83,13 +88,12 @@ public class AccountBookService implements Serializable {
         return monthAccountBook;
     }
 
-
     public DayAccountBook getDayAccountBook(int day, String userNickName) {
         Map<Integer, DayAccountBook> monthAccountBook = getToFile(userNickName);
 
         return (monthAccountBook.containsKey(day)) ? monthAccountBook.get(day) : new DayAccountBook();
-
     }
+  
     public GetMonthDataVO getMonthMoney(String userNickName){
 
         Map<Integer, DayAccountBook> monthAccountBook = getToFile(userNickName); // 월별 거래내역
@@ -103,19 +107,25 @@ public class AccountBookService implements Serializable {
         long maxCategoryMoney = 0;          //category 에서 사용한 금액
         long monthTotalMoney = 0;           //이번달 총 지출 민 수익내역// 돈을 많이 쓰는 카테고리를 반한하기 위한 map
 
+        // 모든 일자의 데이터를 합산
         for(Entry<Integer, DayAccountBook> dayMoney : monthAccountBook.entrySet()){
+            long = 0;
+            long dayExpense = 0;
 
             for(TransactionAccountBook transactionAccountBook : dayMoney.getValue().getTransactionAccountBooks()) {
                 money = transactionAccountBook.getMoney();
                 if(transactionAccountBook.isBenefit()){
+                    dayIncome += money;
                     income += money;
                 }
                 else {
+                    dayExpense += money;
                     expense += money;
                     category = transactionAccountBook.getAccountCategory();
-                    categoryMoneyCheck.put(category, categoryMoneyCheck.getOrDefault(category, 0L)  + money);
+                    categoryMoneyCheck.put(category, categoryMoneyCheck.getOrDefault(category, 0L) + money);
                 }
             }
+          
             monthTotalMoney = income - expense;
 
             if (!categoryMoneyCheck.isEmpty()) {
@@ -123,10 +133,8 @@ public class AccountBookService implements Serializable {
                 category = maxEntry.getKey();
                 maxCategoryMoney = maxEntry.getValue();
             }
-
             daysMoney.put(dayMoney.getKey(), new DayMoney(income, expense));
         }
-
         return new GetMonthDataVO(daysMoney, category, maxCategoryMoney, monthTotalMoney);
     }
 
@@ -149,5 +157,6 @@ public class AccountBookService implements Serializable {
         saveToFile(monthAccountBook);
     }
 }
+
 
 

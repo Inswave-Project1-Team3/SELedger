@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import model.DayAccountBook;
 import service.AccountBookService;
 
+import static app.App.userNickName;
+
 @RequiredArgsConstructor
 public class AccountBookController {
     /** 가계부 서비스 */
@@ -18,6 +20,7 @@ public class AccountBookController {
                                      CreateTransactionAccountBookDTO transactionAccountBookDTO,
                                      int day){
     accountBookService.createAccountBook(AccountBookDTO, transactionAccountBookDTO, day);
+
     }
 
     // 월별 가계부 가져오기
@@ -36,9 +39,7 @@ public class AccountBookController {
     }
 
     // 상세 가계부 내역 삭제
-    public void deleteDayAccountBook(int transactionNumber, int day){
+    public void deleteDayAccountBook(int transactionNumber, int day) {
         accountBookService.deleteDayAccountBook(transactionNumber, day);
-
     }
 }
-
