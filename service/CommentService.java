@@ -2,13 +2,13 @@ package service;
 
 import java.io.*;
 import java.util.*;
-
 import DTO.CreateCommentDTO;
 import app.App;
 import model.Comment;
 
 /**
- * 댓글 관리 서비스
+ * 댓글 관리 서비스 클래스  
+ * 댓글 추가, 검색, 삭제, 파일 입출력 기능 제공
  */
 public class CommentService {
     private List<Comment> comments;
@@ -16,7 +16,7 @@ public class CommentService {
     private static final String COMMENT_FILE = "Allcomment.ser";
 
     /**
-     * 생성자 - 댓글 목록 초기화
+     * 생성자 - 파일에서 댓글 목록을 읽어와 초기화
      */
     public CommentService() {
         this.comments = readListFromFile();
@@ -24,8 +24,7 @@ public class CommentService {
 
     /**
      * 댓글 추가
-     * 
-     * @param newComment 추가할 댓글
+     * @param newComment 추가할 댓글 객체
      */
     public void addComment(Comment newComment) {
         this.comments.add(newComment);
@@ -33,9 +32,8 @@ public class CommentService {
     }
 
     /**
-     * 현재 사용자의 댓글 검색
-     * 
-     * @return 댓글 목록
+     * 현재 사용자와 월에 해당하는 댓글 검색
+     * @return 검색된 댓글 목록
      */
     public List<Comment> searchComments() {
         List<Comment> foundComments = new ArrayList<>();
@@ -48,11 +46,10 @@ public class CommentService {
     }
     
     /**
-     * 특정 사용자의 댓글 검색
-     * 
+     * 특정 사용자의 특정 월에 해당하는 댓글 검색
      * @param nickname 사용자 닉네임
      * @param month 월
-     * @return 댓글 목록
+     * @return 검색된 댓글 목록
      */
     public List<Comment> searchCommentsByUser(String nickname, int month) {
         List<Comment> foundComments = new ArrayList<>();
@@ -65,10 +62,9 @@ public class CommentService {
     }
     
     /**
-     * 현재 사용자의 특정 일자 댓글 검색
-     * 
+     * 현재 사용자, 현재 월, 특정 일에 해당하는 댓글 검색
      * @param day 검색할 일
-     * @return 댓글 목록
+     * @return 검색된 댓글 목록
      */
     public List<Comment> searchCommentsByDay(int day) {
         List<Comment> foundComments = new ArrayList<>();
@@ -83,12 +79,11 @@ public class CommentService {
     }
     
     /**
-     * 특정 사용자의 특정 일자 댓글 검색
-     * 
+     * 특정 사용자, 특정 월, 특정 일에 해당하는 댓글 검색
      * @param nickname 사용자 닉네임
      * @param month 검색할 월
      * @param day 검색할 일
-     * @return 댓글 목록
+     * @return 검색된 댓글 목록
      */
     public List<Comment> searchCommentsByUserAndDay(String nickname, int month, int day) {
         List<Comment> foundComments = new ArrayList<>();
@@ -103,8 +98,7 @@ public class CommentService {
     }
 
     /**
-     * 댓글 내용으로 추가
-     * 
+     * 문자열 context를 이용해 댓글 추가
      * @param context 댓글 내용
      * @param day 댓글 작성 일자
      * @return 업데이트된 댓글 목록
@@ -117,9 +111,8 @@ public class CommentService {
     }
 
     /**
-     * DTO로 댓글 추가
-     * 
-     * @param dto 댓글 생성 DTO
+     * DTO를 활용하여 댓글 추가
+     * @param dto 댓글 생성 DTO (context 포함)
      * @param day 댓글 작성 일자
      * @return 업데이트된 댓글 목록
      */
@@ -129,7 +122,6 @@ public class CommentService {
     
     /**
      * 친구 가계부에 댓글 추가
-     * 
      * @param friendNickname 친구 닉네임
      * @param context 댓글 내용
      * @param month 월
@@ -137,32 +129,44 @@ public class CommentService {
      * @return 업데이트된 댓글 목록
      */
     public List<Comment> addCommentToFriendAccountBook(String friendNickname, String context, int month, int day) {
-        // 새로운 Comment 객체 생성 (id는 친구의 닉네임으로, author는 현재 사용자로 설정)
         Comment newComment = new Comment(friendNickname, App.userNickName, context, month, day);
-        
-        // 댓글 목록에 추가
         this.comments.add(newComment);
-        
-        // 변경사항 저장
         saveComments();
-        
-        // 업데이트된 댓글 목록 반환
         return this.comments;
+    }
+    
+    /**
+     * 댓글 삭제 기능  
+     * 현재 사용자의 댓글 중, 해당 월(App.month)과 day, 그리고 content가 일치하는 댓글을 삭제
+     * @param context 삭제할 댓글 내용
+     * @param month 삭제할 댓글의 월
+     * @param day 삭제할 댓글의 일
+     * @return 삭제 성공시 true, 아니면 false
+     */
+    public boolean deleteComment(int month, int day) {
+        Iterator<Comment> iterator = comments.iterator();
+        while (iterator.hasNext()) {
+            Comment comment = iterator.next();
+            if (comment.getId().equals(App.userNickName) &&
+                comment.getMonth() == month &&
+                comment.getday() == day) {
+                iterator.remove();
+                saveComments();
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
-     * 댓글 목록 저장
+     * 현재 댓글 목록을 파일에 저장
      */
     private void saveComments() {
         File file = getCommentFile();
-        
-        // 디렉토리가 없으면 생성
         File parentDir = file.getParentFile();
         if (parentDir != null && !parentDir.exists()) {
             parentDir.mkdirs();
         }
-
-        // 객체 직렬화하여 파일에 저장
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
             oos.writeObject(this.comments);
             System.out.println("댓글 데이터를 파일에 저장했습니다.");
@@ -174,35 +178,28 @@ public class CommentService {
 
     /**
      * 파일에서 댓글 목록 읽기
-     * 
-     * @return 댓글 목록
+     * @return 읽어온 댓글 목록
      */
     @SuppressWarnings("unchecked")
     private List<Comment> readListFromFile() {
         File file = getCommentFile();
-
-        // 파일이 존재하지 않으면 빈 리스트 반환
         if (!file.exists()) {
             return new ArrayList<>();
         }
-
-        // 파일에서 객체 리스트 읽기
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
             return (List<Comment>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             System.err.println("댓글 데이터 읽기 중 오류 발생: " + e.getMessage());
             e.printStackTrace();
         }
-
         return new ArrayList<>();
     }
     
     /**
      * 댓글 파일 경로 반환
-     * 
-     * @return 댓글 파일
+     * @return 댓글 파일 객체
      */
     private File getCommentFile() {
         return new File(DATA_DIRECTORY + File.separator + COMMENT_FILE);
     }
-}   
+}
