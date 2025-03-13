@@ -190,7 +190,7 @@ public class App {
         if (!isUserAuthorized()) return;
 
         System.out.println("수익인 경우 0, 지출인 경우 1 을 입력하세요");
-        boolean benefitCheck = stringcheck.BooleanInputCheck(sc.nextLine());
+        boolean benefitCheck = stringcheck.BooleanInputCheck(sc);
 
         System.out.println("카테고리");
         accountBookPage.categoryView(benefitCheck);
