@@ -6,8 +6,18 @@ import model.Comment;
 import service.CommentService;
 import app.App;
 
+/**
+ * 댓글 관련 요청 처리 컨트롤러
+ */
 public class CommentController {
-    CommentService commentService = new CommentService();
+    private final CommentService commentService;
+    
+    /**
+     * 생성자 - 서비스 초기화
+     */
+    public CommentController() {
+        this.commentService = new CommentService();
+    }
     
     /**
      * 현재 사용자의 특정 일에 해당하는 댓글 목록 조회 및 출력
@@ -15,15 +25,7 @@ public class CommentController {
      */
     public void showCommentByDay(int day) {
         List<Comment> results = commentService.searchCommentsByDay(day);
-        if (results.isEmpty()) {
-            System.out.println("댓글이 없습니다.");
-        } else {
-            System.out.println("===== " + App.userNickName + "님의 " + App.month + "월 " + day + "일 댓글 목록 =====");
-            for (Comment comment : results) {
-                System.out.println("[작성자: " + comment.getAuthor() + "] " + comment.getcontext());
-            }
-            System.out.println("===============================");
-        }
+        displayComments(results, App.userNickName, App.month, day);
     }
     
     /**
@@ -34,11 +36,22 @@ public class CommentController {
      */
     public void showCommentByUserAndDay(String nickname, int month, int day) {
         List<Comment> results = commentService.searchCommentsByUserAndDay(nickname, month, day);
-        if (results.isEmpty()) {
+        displayComments(results, nickname, month, day);
+    }
+    
+    /**
+     * 댓글 목록 출력 헬퍼 메소드
+     * @param comments 출력할 댓글 목록
+     * @param nickname 사용자 닉네임
+     * @param month 월
+     * @param day 일
+     */
+    private void displayComments(List<Comment> comments, String nickname, int month, int day) {
+        if (comments.isEmpty()) {
             System.out.println("댓글이 없습니다.");
         } else {
             System.out.println("===== " + nickname + "님의 " + month + "월 " + day + "일 댓글 목록 =====");
-            for (Comment comment : results) {
+            for (Comment comment : comments) {
                 System.out.println("[작성자: " + comment.getAuthor() + "] " + comment.getcontext());
             }
             System.out.println("===============================");
@@ -47,23 +60,23 @@ public class CommentController {
     
     /**
      * 자신의 가계부에 댓글 추가
-     * @param context 댓글 내용
+     * @param content 댓글 내용
      * @param day 댓글 작성 일자
      */
-    public void addComment(String context, int day) {
-        commentService.addCommentWithContext(context, day);
+    public void addComment(String content, int day) {
+        commentService.addCommentWithContext(content, day);
         System.out.println("댓글이 추가되었습니다.");
     }
     
     /**
      * 친구 가계부에 댓글 추가
      * @param friendNickname 친구 닉네임
-     * @param context 댓글 내용
+     * @param content 댓글 내용
      * @param month 월
      * @param day 일
      */
-    public void addCommentToFriend(String friendNickname, String context, int month, int day) {
-        commentService.addCommentToFriendAccountBook(friendNickname, context, month, day);
+    public void addCommentToFriend(String friendNickname, String content, int month, int day) {
+        commentService.addCommentToFriendAccountBook(friendNickname, content, month, day);
         System.out.println(friendNickname + "님의 가계부에 댓글이 추가되었습니다.");
     }
     
@@ -90,7 +103,14 @@ public class CommentController {
         System.out.println("삭제할 댓글 번호를 입력하세요 (0: 취소):");
         // 버퍼 비우기 (이전 입력의 개행 문자 제거)
         scanner.nextLine();
-        int selection = Integer.parseInt(scanner.nextLine());
+        
+        int selection;
+        try {
+            selection = Integer.parseInt(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("유효한 숫자를 입력해주세요.");
+            return;
+        }
         
         if (selection == 0) {
             System.out.println("댓글 삭제가 취소되었습니다.");
@@ -110,6 +130,4 @@ public class CommentController {
             System.out.println("댓글 삭제에 실패했습니다.");
         }
     }
-    
- 
 }

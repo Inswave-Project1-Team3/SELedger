@@ -39,6 +39,7 @@ public class App {
     StringCheck stringCheck = new StringCheck();
     UserController userController = new UserController();
     AccountBookController accountBookController = new AccountBookController();
+    controller.CommentController commentController = new controller.CommentController();
 
     //애플리케이션 실행 메서드
     public void run() {
@@ -342,8 +343,6 @@ public class App {
         sc.nextLine(); // 버퍼 비우기
         String comment = sc.nextLine();
         
-        controller.CommentController commentController = new controller.CommentController();
-        
         if (visitUserNickname.isEmpty()) {
             // 자신의 가계부에 댓글 추가
             commentController.addComment(comment, day);
@@ -357,8 +356,6 @@ public class App {
      * 현재 선택된 가계부의 댓글 목록 조회
      */
     private void showComments() {
-        controller.CommentController commentController = new controller.CommentController();
-        
         if (visitUserNickname.isEmpty()) {
             // 자신의 가계부 댓글 조회 (특정 날짜)
             commentController.showCommentByDay(day);
@@ -372,7 +369,6 @@ public class App {
      * 사용자의 댓글 삭제 메뉴
      */
     private void deleteUserComment() {
-        controller.CommentController commentController = new controller.CommentController();
         commentController.deleteCommentByUserSelection(sc);
     }
 

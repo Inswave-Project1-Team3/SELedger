@@ -208,12 +208,8 @@ public class UserController {
 	 * @param email 사용자 이메일
 	 */
 	private void updateAppSession(boolean loginStatus, String email) {
-		try {
-			// 리플렉션을 사용하지 않고 직접 접근 (호환성 유지)
-			App.loginCheck = loginStatus;
-			App.userEmail = email;
-		} catch (Exception e) {
-			// App 클래스가 없거나 접근할 수 없는 경우 무시
-		}
+		// 리플렉션을 사용하지 않고 직접 접근
+		App.loginCheck = loginStatus;
+		App.userEmail = email;
 	}
 }
