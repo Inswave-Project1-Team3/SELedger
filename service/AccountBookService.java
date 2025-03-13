@@ -109,7 +109,7 @@ public class AccountBookService implements Serializable {
 
         // 모든 일자의 데이터를 합산
         for(Entry<Integer, DayAccountBook> dayMoney : monthAccountBook.entrySet()){
-            long = 0;
+            long dayIncome = 0;
             long dayExpense = 0;
 
             for(TransactionAccountBook transactionAccountBook : dayMoney.getValue().getTransactionAccountBooks()) {
