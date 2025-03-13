@@ -142,15 +142,4 @@ public class UserRepository {
 	public List<User> findAll() {
 		return new ArrayList<>(users); // 원본 리스트 보호를 위한 복사본 반환
 	}
-
-	/**
-	 * 활성 상태인 사용자만 조회
-	 * 
-	 * @return 활성 사용자 목록
-	 */
-	public List<User> findAllActive() {
-		return users.stream()
-				.filter(user -> !user.isDeleted())
-				.collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
-	}
 } 

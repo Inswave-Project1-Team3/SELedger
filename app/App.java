@@ -5,8 +5,8 @@ import java.util.Scanner;
 
 import DTO.*;
 import DTO.VO.GetMonthDataVO;
-import contoller.AccountBookController;
-import contoller.UserController;
+import controller.AccountBookController;
+import controller.UserController;
 import model.*;
 import util.InputValidator;
 import util.StringCheck;
@@ -343,7 +343,7 @@ public class App {
         sc.nextLine(); // 버퍼 비우기
         String comment = sc.nextLine();
         
-        contoller.CommentController commentController = new contoller.CommentController();
+        controller.CommentController commentController = new controller.CommentController();
         
         if (visitUserNickname.isEmpty()) {
             // 자신의 가계부에 댓글 추가
@@ -358,7 +358,7 @@ public class App {
      * 현재 선택된 가계부의 댓글 목록 조회
      */
     private void showComments() {
-        contoller.CommentController commentController = new contoller.CommentController();
+        controller.CommentController commentController = new controller.CommentController();
         
         if (visitUserNickname.isEmpty()) {
             // 자신의 가계부 댓글 조회 (특정 날짜)
@@ -373,7 +373,7 @@ public class App {
      * 사용자의 댓글 삭제 메뉴
      */
     private void deleteUserComment() {
-        contoller.CommentController commentController = new contoller.CommentController();
+        controller.CommentController commentController = new controller.CommentController();
         commentController.deleteCommentByUserSelection(sc);
     }
 

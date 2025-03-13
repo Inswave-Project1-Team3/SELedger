@@ -4,7 +4,7 @@ import DTO.CreateUserDTO;
 import DTO.DeleteUserDTO;
 import DTO.LoginUserDTO;
 import DTO.UpdateUserDTO;
-import contoller.UserController;
+import controller.UserController;
 import model.User;
 import util.InputValidator;
 import util.StringCheck;

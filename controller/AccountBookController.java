@@ -1,4 +1,4 @@
-package contoller;
+package controller;
 
 import DTO.CreateAccountBookDTO;
 import DTO.CreateTransactionAccountBookDTO;
@@ -7,8 +7,6 @@ import DTO.VO.GetMonthDataVO;
 import lombok.RequiredArgsConstructor;
 import model.DayAccountBook;
 import service.AccountBookService;
-
-import static app.App.userNickName;
 
 @RequiredArgsConstructor
 public class AccountBookController {

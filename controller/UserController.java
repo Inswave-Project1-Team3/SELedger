@@ -1,4 +1,4 @@
-package contoller;
+package controller;
 
 import DTO.CreateUserDTO;
 import DTO.DeleteUserDTO;
@@ -7,7 +7,6 @@ import DTO.UpdateUserDTO;
 import app.App;
 import model.User;
 import service.UserService;
-import util.FileUtil;
 
 /**
  * 사용자 관련 요청 처리 컨트롤러
