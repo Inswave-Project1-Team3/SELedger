@@ -158,7 +158,7 @@ public class App {
         accountBookPage.DayAccountBookPage(dayAccountBook, month, day);
 
 
-        System.out.println("1. 내역 추가 / 2. 내역 수정 / 3. 내역 삭제 / 4. 댓글달기 / 5. 댓글보기 / 9. 뒤로가기");
+        System.out.println("1. 내역 추가 / 2. 내역 수정 / 3. 내역 삭제 / 4. 댓글달기 / 5. 댓글보기 / 6. 댓글삭제 / 9. 뒤로가기");
         int accountBookNumber = stringcheck.numberCheck(sc);
         switch (accountBookNumber) {
             case 1:
@@ -175,6 +175,11 @@ public class App {
                 break;
             case 5: // 댓글보기
                 showComments();
+                break;
+            case 6: // 댓글삭제
+                if (isUserAuthorized()) {
+                    deleteUserComment();
+                }
                 break;
             case 9: // 뒤로가기
                 visitUserNickname = "";
@@ -335,7 +340,8 @@ public class App {
      */
     private void addCommentToDay() {
         System.out.println("댓글을 입력하세요:");
-        String comment = sc.next();
+        sc.nextLine(); // 버퍼 비우기
+        String comment = sc.nextLine();
         
         contoller.CommentController commentController = new contoller.CommentController();
         
@@ -361,6 +367,14 @@ public class App {
             // 친구 가계부 댓글 조회 (특정 날짜)
             commentController.showCommentByUserAndDay(visitUserNickname, month, day);
         }
+    }
+
+    /**
+     * 사용자의 댓글 삭제 메뉴
+     */
+    private void deleteUserComment() {
+        contoller.CommentController commentController = new contoller.CommentController();
+        commentController.deleteCommentByUserSelection(sc);
     }
 
 }

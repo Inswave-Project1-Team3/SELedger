@@ -23,15 +23,6 @@ public class CommentService {
     }
 
     /**
-     * 댓글 추가
-     * @param newComment 추가할 댓글 객체
-     */
-    public void addComment(Comment newComment) {
-        this.comments.add(newComment);
-        saveComments(); // 변경사항 저장
-    }
-
-    /**
      * 현재 사용자와 월에 해당하는 댓글 검색
      * @return 검색된 댓글 목록
      */
@@ -39,22 +30,6 @@ public class CommentService {
         List<Comment> foundComments = new ArrayList<>();
         for (Comment comment : comments) {
             if (comment.getId().equals(App.userNickName) && comment.getMonth() == App.month) {
-                foundComments.add(comment);
-            }
-        }
-        return foundComments;
-    }
-    
-    /**
-     * 특정 사용자의 특정 월에 해당하는 댓글 검색
-     * @param nickname 사용자 닉네임
-     * @param month 월
-     * @return 검색된 댓글 목록
-     */
-    public List<Comment> searchCommentsByUser(String nickname, int month) {
-        List<Comment> foundComments = new ArrayList<>();
-        for (Comment comment : comments) {
-            if (comment.getId().equals(nickname) && comment.getMonth() == month) {
                 foundComments.add(comment);
             }
         }
@@ -109,16 +84,6 @@ public class CommentService {
         saveComments();
         return this.comments;
     }
-
-    /**
-     * DTO를 활용하여 댓글 추가
-     * @param dto 댓글 생성 DTO (context 포함)
-     * @param day 댓글 작성 일자
-     * @return 업데이트된 댓글 목록
-     */
-    public List<Comment> addCommentWithDTO(CreateCommentDTO dto, int day) {
-        return addCommentWithContext(dto.context, day);
-    }
     
     /**
      * 친구 가계부에 댓글 추가
@@ -156,6 +121,23 @@ public class CommentService {
             }
         }
         return false;
+    }
+
+    /**
+     * 현재 사용자의 댓글 중 특정 인덱스의 댓글을 삭제
+     * @param commentList 사용자의 댓글 목록
+     * @param index 삭제할 댓글의 인덱스
+     * @return 삭제 성공시 true, 실패시 false
+     */
+    public boolean deleteCommentByIndex(List<Comment> commentList, int index) {
+        if (index < 0 || index >= commentList.size()) {
+            return false; // 인덱스가 범위를 벗어남
+        }
+        
+        Comment commentToDelete = commentList.get(index);
+        comments.remove(commentToDelete); // 전체 목록에서 해당 댓글 삭제
+        saveComments(); // 변경사항 저장
+        return true;
     }
 
     /**

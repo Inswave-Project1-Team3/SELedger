@@ -1,6 +1,7 @@
 package contoller;
 
 import java.util.List;
+import java.util.Scanner;
 import model.Comment;
 import service.CommentService;
 import app.App;
@@ -71,17 +72,46 @@ public class CommentController {
     }
     
     /**
-     * 댓글 삭제 기능  
-     * 현재 사용자(App.userNickName)의 댓글 중, App.month와 주어진 day, 그리고 content가 일치하는 댓글 삭제
-     * @param context 삭제할 댓글 내용
-     * @param day 삭제할 댓글 작성 일자
+     * 사용자의 댓글 목록을 보여주고 삭제할 댓글 번호를 입력받아 삭제
+     * @param scanner 입력을 받을 Scanner 객체
      */
-    public void deleteComment() {
-        boolean deleted = commentService.deleteComment(App.month, App.day);
+    public void deleteCommentByUserSelection(Scanner scanner) {
+        List<Comment> userComments = commentService.searchComments();
+        if (userComments.isEmpty()) {
+            System.out.println("삭제할 댓글이 없습니다.");
+            return;
+        }
+        
+        // 사용자의 댓글 목록 표시
+        System.out.println("===== " + App.userNickName + "님의 댓글 목록 =====");
+        for (int i = 0; i < userComments.size(); i++) {
+            Comment comment = userComments.get(i);
+            System.out.println((i+1) + ". [" + comment.getMonth() + "월 " + comment.getday() + "일] " + comment.getcontext());
+        }
+        System.out.println("===============================");
+        
+        // 삭제할 댓글 번호 입력 받기
+        System.out.println("삭제할 댓글 번호를 입력하세요 (0: 취소):");
+        // 버퍼 비우기 (이전 입력의 개행 문자 제거)
+        scanner.nextLine();
+        int selection = Integer.parseInt(scanner.nextLine());
+        
+        if (selection == 0) {
+            System.out.println("댓글 삭제가 취소되었습니다.");
+            return;
+        }
+        
+        if (selection < 1 || selection > userComments.size()) {
+            System.out.println("유효하지 않은 번호입니다.");
+            return;
+        }
+        
+        // 선택한 댓글 삭제
+        boolean deleted = commentService.deleteCommentByIndex(userComments, selection - 1);
         if (deleted) {
             System.out.println("댓글이 삭제되었습니다.");
         } else {
-            System.out.println("삭제할 댓글을 찾을 수 없습니다.");
+            System.out.println("댓글 삭제에 실패했습니다.");
         }
     }
     
