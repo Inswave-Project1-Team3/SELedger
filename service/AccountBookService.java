@@ -100,8 +100,8 @@ public class AccountBookService implements Serializable {
         Map<Integer, DayMoney> daysMoney = new HashMap<>();             // key : 일수, DayMoney : 일일 총 수익 및 지출 
         Map<AccountCategory, Long> categoryMoneyCheck = new HashMap<>();     // 가장
 
-        long income = 0;                    //일수별 수익
-        long expense = 0;                   //일수별 지출
+        long income = 0;                    // 월별 총 수익
+        long expense = 0;                   // 월별 총 지출
         long money;                     //가계부 건당 수익 및 지출비용
         AccountCategory category = null;    //월별 가장 많이 지출한 카테고리
         long maxCategoryMoney = 0;          //category 에서 사용한 금액
@@ -109,17 +109,17 @@ public class AccountBookService implements Serializable {
 
         // 모든 일자의 데이터를 합산
         for(Entry<Integer, DayAccountBook> dayMoney : monthAccountBook.entrySet()){
-            long dayIncome = 0;
-            long dayExpense = 0;
+            long dailyIncome= 0;            //일수별 수익
+            long dailyExpense = 0;          //일수별 지출
 
             for(TransactionAccountBook transactionAccountBook : dayMoney.getValue().getTransactionAccountBooks()) {
                 money = transactionAccountBook.getMoney();
                 if(transactionAccountBook.isBenefit()){
-                    dayIncome += money;
+                    dailyIncome += money;
                     income += money;
                 }
                 else {
-                    dayExpense += money;
+                    dailyExpense += money;
                     expense += money;
                     category = transactionAccountBook.getAccountCategory();
                     categoryMoneyCheck.put(category, categoryMoneyCheck.getOrDefault(category, 0L) + money);
@@ -133,7 +133,7 @@ public class AccountBookService implements Serializable {
                 category = maxEntry.getKey();
                 maxCategoryMoney = maxEntry.getValue();
             }
-            daysMoney.put(dayMoney.getKey(), new DayMoney(income, expense));
+            daysMoney.put(dayMoney.getKey(), new DayMoney(dailyIncome, dailyExpense));
         }
         return new GetMonthDataVO(daysMoney, category, maxCategoryMoney, monthTotalMoney);
     }

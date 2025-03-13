@@ -7,10 +7,10 @@ import java.util.regex.Pattern;
  */
 public class InputValidator {
 	/** 이메일 정규 표현식 */
-	private static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+	private static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,256}$";
 	
 	/** 비밀번호 정규 표현식 (8자 이상, 특수문자 포함) */
-	private static final String PASSWORD_REGEX = "^(?=.*[!@#$%^&*(),.?\":{}|<>])(?=\\S+$).{8,}$";
+	private static final String PASSWORD_REGEX = "^(?=.*[!@#$%^&*(),.?\":{}|<>])(?=\\S+$).{8,16}$";
 	
 	/** 닉네임 정규 표현식 (한글, 영문, 숫자 2~12자) */
 	private static final String NICKNAME_REGEX = "^[가-힣a-zA-Z0-9]{2,12}$";
@@ -51,7 +51,7 @@ public class InputValidator {
 			return "이메일 형식이 올바르지 않습니다. (예: example@domain.com)";
 		
 		if (!isValidPassword(password))
-			return "비밀번호는 8자리 이상이며, 최소 하나 이상의 특수문자를 포함해야 합니다.";
+			return "비밀번호는 8자리 이상 16자리 이하 이며, 최소 하나 이상의 특수문자를 포함해야 합니다.";
 		
 		if (!isValidNickname(nickname))
 			return "닉네임은 한글, 영문, 숫자만 허용되며, 2~12자 이내여야 합니다.";
