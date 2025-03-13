@@ -95,7 +95,7 @@ public class App {
 
     private void exitProgram() {
         System.out.println("프로그램을 종료합니다.");
-        sc.close();
+        System.exit(0);
     }
 
     private void handleLoggedInUser() {
@@ -122,7 +122,6 @@ public class App {
                 updateUser();
                 break;
             case 7:
-                userNickName = "";
                 visitUserNickname = "";
                 break;
             case 8:
@@ -150,8 +149,8 @@ public class App {
 
     private void viewDetailedDay() {
         System.out.println("조회하고 싶은 월수와 일수를 입력해주세요");
-        month = stringcheck.numberCheck(sc);
-        day = stringcheck.numberCheck(sc);
+        month = stringcheck.monthCheck(sc);
+        day = stringcheck.dayCheck(sc);
 
         DayAccountBook dayAccountBook = (visitUserNickname.isEmpty()) ?
                 accountBookController.getDayAccountBook(day, userNickName) :
@@ -177,15 +176,15 @@ public class App {
                 System.out.println("메인 메뉴로 돌아갑니다.");
                 break;
             default:
-                System.out.println("올바른 값을 입력하세요.");
+                System.out.println("올바른 값을 입력해 주세요");
         }
     }
 
     private void addTransaction(int day) {
         if (!isUserAuthorized()) return;
 
-        System.out.println("수익이면 0, 지출이면 1");
-        boolean benefitCheck = (sc.next().equals("0"));
+        System.out.println("수익인 경우 0, 지출인 경우 1 을 입력하세요");
+        boolean benefitCheck = stringcheck.BooleanInputCheck(sc);
 
         System.out.println("카테고리");
         accountBookPage.categoryView(benefitCheck);
@@ -308,9 +307,11 @@ public class App {
             System.out.println("비밀번호를 입력하세요:");
             String password = sc.next();
 
-            userController.deleteUser(new DeleteUserDTO(userEmail, password));
-            userNickName = "";
-            visitUserNickname = "";
+            boolean deleteCheck = userController.deleteUser(new DeleteUserDTO(userEmail, password));
+            if(deleteCheck) {
+                userNickName = "";
+                visitUserNickname = "";
+            }
         } else {
             System.out.println("회원탈퇴가 취소되었습니다.");
         }

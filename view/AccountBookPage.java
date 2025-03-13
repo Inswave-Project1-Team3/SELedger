@@ -83,8 +83,8 @@ public class AccountBookPage {
         String[] cell = new String[CELL_HEIGHT];
         cell[0] = String.valueOf(day);
         if (data != null) {
-            cell[1] = " + " + data.getIncome();
-            cell[2] = " - " + data.getExpense();
+            cell[1] = (data.getIncome() != 0) ? " + " + data.getIncome() : "";
+            cell[2] = (data.getExpense() != 0) ? " - " + data.getExpense() : "";
         } else {
             cell[1] = "";
             cell[2] = "";
